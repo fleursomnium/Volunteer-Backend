@@ -1,12 +1,25 @@
-import express from "express";
+const express = require("express");
+const bodyParser = require("body-parser");
+const eventRoutes = require("./src/routes/eventRoutes");
+const userRoutes = require("./src/routes/userRoutes");
 
 const app = express();
+const PORT = process.env.PORT || 3030;
 
-app.use(express.json());
+app.use(bodyParser.json());
 
-app.get('/api/hello', async (req, res) => {
-    res.send('Hello from Express');
+app.use("/api/events", eventRoutes);
+app.use("/api/users", userRoutes);
+
+app.get("/", (req, res) => {
+  res.send("Welcome to the Event Management System API");
 });
 
-const PORT = 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

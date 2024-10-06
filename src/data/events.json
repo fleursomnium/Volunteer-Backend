@@ -1,0 +1,42 @@
+[
+  {
+    "id": "19740957-42ad-4235-86c6-f07bfc241c4c",
+    "name": "Tech Conference 2024",
+    "date": "2024-11-15",
+    "location": "San Francisco, CA",
+    "description": "A conference about the latest in technology.",
+    "createdAt": "2024-10-06T17:49:03.168Z"
+  },
+  {
+    "id": "3b87bc57-fdcd-4fab-be79-e25223f92c2d",
+    "createdAt": "2024-10-06T18:53:58.578Z",
+    "name": "Tech Conference 2024",
+    "date": "2024-11-15",
+    "location": "San Francisco, CA",
+    "description": "A conference about the latest in technology."
+  },
+  {
+    "id": "6571834d-a043-4de4-af70-50f534839bbc",
+    "createdAt": "2024-10-06T18:54:21.531Z",
+    "name": "Tech Conference 2024",
+    "date": "2024-11-15",
+    "location": "San Francisco, CA",
+    "description": "A conference about the latest in technology."
+  },
+  {
+    "id": "a2eab3bc-aae7-40e8-9188-538117affd2e",
+    "name": "Tech Conference 2024",
+    "date": "2024-11-15",
+    "location": "San Francisco, CA",
+    "description": "A conference about the latest in technology.",
+    "createdAt": "2024-10-06T19:42:06.884Z"
+  },
+  {
+    "id": "14cbc12e-b093-4c7c-bfca-05081d94f60d",
+    "name": "event management",
+    "date": "2024-10-06",
+    "location": "Houston, Tx",
+    "description": "A form to management.",
+    "createdAt": "2024-10-06T19:45:14.393Z"
+  }
+]
