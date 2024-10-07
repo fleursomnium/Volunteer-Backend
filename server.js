@@ -2,7 +2,10 @@ import express from 'express';
 import cors from 'cors';
 
 // Import the routes
-import volunteerHistoryRoutes from './routes/routes/volunteerHistory.js';
+import volunteerHistoryRoutes from './routes/routes/volunteerHistory.js'; // Gaby
+import LoginRoute from './routes/routes/Login.js'; // Mel
+// Syeda
+// Angie
 
 const app = express();
 
@@ -10,7 +13,10 @@ app.use(cors());
 app.use(express.json());  // To parse JSON data
 
 // Use the routes
-app.use('/api/volunteer-history', volunteerHistoryRoutes);
+app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby
+app.use('/api/login', LoginRoute); // Mel
+// Syeda
+// Angie
 
 // Placeholder routes for other pages
 app.get('/', (req, res) => res.json({ message: 'Welcome to the Home page!' }));
