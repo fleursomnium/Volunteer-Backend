@@ -4,7 +4,7 @@ const eventRoutes = require("./src/routes/eventRoutes");
 const userRoutes = require("./src/routes/userRoutes");
 
 const app = express();
-const PORT = process.env.PORT || 3030;
+const PORT = process.env.PORT || 4000;
 
 app.use(bodyParser.json());
 
