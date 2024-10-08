@@ -16,9 +16,9 @@ app.use(express.json());  // To parse JSON data
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Import the routes
-import volunteerHistoryRoutes from './routes/routes/volunteerHistory.js'; // Gaby
-import LoginRoute from './routes/routes/Login.js'; // Mel
-import VolunteerDashboardRoute from './routes/routes/VolunteerDashboard.js'; // Mel
+import volunteerHistoryRoutes from './routes/volunteerHistory.js'; // Gaby
+import LoginRoute from './routes/Login.js'; // Mel
+import VolunteerDashboardRoute from './routes/VolunteerDashboard.js'; // Mel
 // Syeda
 // Angie
 
