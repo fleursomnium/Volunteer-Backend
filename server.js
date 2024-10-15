@@ -29,14 +29,14 @@ import volunteerHistoryRoutes from './src/routes/volunteerHistory.js'; // Adjust
 import LoginRoute from './src/routes/Login.js'; // Adjust for Mel's routes
 import VolunteerDashboardRoute from './src/routes/VolunteerDashboard.js'; // Adjust for Mel's routes
 import userRoutes from './src/routes/userRoutes.js'; // Correct relative path for Syeda's Volunteer Management Form
-
+import eventRoutes from './src/routes/eventRoutes.js';
 
 // Use the routes
 app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby's Volunteer History Routes
 app.use('/api/login', LoginRoute); // Mel's Login Route
 app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel's Volunteer Dashboard Route
 app.use('/api/users', userRoutes); // Syeda's Volunteer Management Form Route
-
+app.use('/api/events', eventRoutes);
 
 // Placeholder routes for other pages
 app.get('/', (req, res) => res.json({ message: 'Welcome to the Home page!' }));
