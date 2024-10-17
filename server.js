@@ -25,18 +25,22 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
 // Import the routes
-import volunteerHistoryRoutes from './src/routes/volunteerHistory.js'; // Adjust for Gaby's routes
-import LoginRoute from './src/routes/Login.js'; // Adjust for Mel's routes
-import VolunteerDashboardRoute from './src/routes/VolunteerDashboard.js'; // Adjust for Mel's routes
-import userRoutes from './src/routes/userRoutes.js'; // Correct relative path for Syeda's Volunteer Management Form
-import eventRoutes from './src/routes/eventRoutes.js';
+import volunteerHistoryRoutes from './src/routes/volunteerHistory.js'; // Gaby
+import LoginRoute from './src/routes/Login.js'; // Mel
+import VolunteerDashboardRoute from './src/routes/VolunteerDashboard.js'; // Mel
+import VolunteerMatchingRoute from './src/routes/volcards.js'; // Angie
+import NotificationsRoute from './src/routes/notifs.js'; // Angie
+// Syeda
 
 // Use the routes
-app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby's Volunteer History Routes
-app.use('/api/login', LoginRoute); // Mel's Login Route
-app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel's Volunteer Dashboard Route
-app.use('/api/users', userRoutes); // Syeda's Volunteer Management Form Route
-app.use('/api/events', eventRoutes);
+app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby
+app.use('/api/login', LoginRoute); // Mel
+app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel
+app.use('/api/notifs', NotificationsRoute); //Angie
+app.use('/api/volcards', VolunteerMatchingRoute); // Angie
+
+// Syeda
+// Angie
 
 // Placeholder routes for other pages
 app.get('/', (req, res) => res.json({ message: 'Welcome to the Home page!' }));
