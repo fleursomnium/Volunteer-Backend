@@ -1,30 +1,12 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
 
 router.get('/', (req, res) => {
   const events = [
-    {
-      id: 1,
-      name: 'Event 1',
-      description: 'Dhjabschjvahjsbcjhavschjvt 1',
-      location: 'Location 1',
-      date: '2024-09-11',
-      urgency: 'high',
-      skills: 'Leadership, Communication',
-      status: 'yes'
-    },
-    {
-      id: 2,
-      name: 'Event 2',
-      description: 'Description of event 2',
-      location: 'Location 2',
-      date: '2024-10-15',
-      urgency: 'low',
-      skills: 'Teamwork, Organization',
-      status: 'no'
-    }
+    { id: 1, name: 'Beach Cleanup', participationDate: '2024-05-01' },
+    { id: 2, name: 'Tree Planting', participationDate: '2024-06-15' },
   ];
   res.json(events);
 });
 
-export default router;
+module.exports = router;

@@ -1,17 +1,11 @@
-import express from 'express';  // Use ES module syntax
-import { createUser } from '../controllers/userController.js';  // Use ES module import
-
+const express = require('express');
+const { registerUser } = require('../controllers/userController');  // Import registerUser
 
 const router = express.Router();
 
+router.post('/register', registerUser);  // Use registerUser as the callback function
 
-router.post("/", createUser);  // Define your POST route for user creation
-
-
-export default router;  // Export the router using ES module syntax
-
-
-
+module.exports = router;
 
 
 

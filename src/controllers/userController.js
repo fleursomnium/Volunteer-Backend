@@ -1,75 +1,28 @@
-import User from '../models/userModel.js';  // Use ES module import
-import { readJSON, writeJSON } from '../utils/fileHandler.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const User = require('../models/userModel');
 
+const registerUser = async (req, res) => {
+  const { firstName, lastName, address1, city, state, zipcode, preferences, skills } = req.body;
 
-// Fix for __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+  const newUser = new User({
+    firstName,
+    lastName,
+    address1,
+    city,
+    state,
+    zipcode,
+    preferences,
+    skills,
+  });
 
-
-const USERS_FILE = path.join(__dirname, "../data/users.json");
-
-
-const createUser = async (req, res, next) => {
   try {
-    const {
-      firstName,
-      lastName,
-      address1,
-      address2,
-      city,
-      state,
-      zipcode,
-      preferences,
-      skills,
-      dates,
-      time,
-    } = req.body;
-
-
-    if (!firstName || !lastName || !address1 || !city || !state || !zipcode) {
-      return res
-        .status(400)
-        .json({
-          message: "Required fields: firstName, lastName, address1, city, state, and zipcode.",
-        });
-    }
-
-
-    const newUser = new User({
-      firstName,
-      lastName,
-      address1,
-      address2,
-      city,
-      state,
-      zipcode,
-      preferences,
-      skills,
-      dates,
-      time,
-    });
-
-
-    const users = await readJSON(USERS_FILE);
-    users.push(newUser);
-
-
-    await writeJSON(USERS_FILE, users);
-
-
-    res
-      .status(201)
-      .json({ message: "User created successfully.", user: newUser });
+    await newUser.save();
+    res.status(201).json({ message: "User registered successfully", data: newUser });
   } catch (error) {
-    next(error);
+    res.status(400).json({ error });
   }
 };
 
-
-export { createUser };
+module.exports = { registerUser };
 
 
 
