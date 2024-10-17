@@ -2,20 +2,24 @@
   "name": "volunteer-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-  "test": "jest --coverage",
+    "test": "jest --coverage",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
+    "supertest": "^7.0.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
