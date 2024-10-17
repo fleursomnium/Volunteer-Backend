@@ -19,13 +19,17 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 import volunteerHistoryRoutes from './src/routes/volunteerHistory.js'; // Gaby
 import LoginRoute from './src/routes/Login.js'; // Mel
 import VolunteerDashboardRoute from './src/routes/VolunteerDashboard.js'; // Mel
+import VolunteerMatchingRoute from './src/routes/volcards.js'; // Angie
+import NotificationsRoute from './src/routes/notifs.js'; // Angie
 // Syeda
-// Angie
 
 // Use the routes
 app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby
 app.use('/api/login', LoginRoute); // Mel
 app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel
+app.use('/api/notifs', NotificationsRoute); //Angie
+app.use('/api/volcards', VolunteerMatchingRoute); // Angie
+
 // Syeda
 // Angie
 
