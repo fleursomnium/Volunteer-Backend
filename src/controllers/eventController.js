@@ -5,42 +5,36 @@ const VolunteerHistory = require('../models/VolunteerHistoryModel');
 // Create a new event
 exports.createEvent = async (req, res) => {
     try {
-      console.log('Event data received:', req.body);
-  
       const { name, description, location, requiredSkills, urgency, date, time } = req.body;
   
-      // Check for empty fields
-      if (!name || !description || !location || !requiredSkills || !urgency || !date || !time) {
-        return res.status(400).json({ message: 'All fields are required' });
-      }
-  
-      const newEvent = new Event({
+      const event = new Event({
         name,
         description,
         location,
         requiredSkills,
         urgency,
         date,
-        time
+        time,
       });
   
-      await newEvent.save();
-      res.status(201).json(newEvent);
+      await event.save();
+      console.log('Event saved:', event);
+      res.status(201).json({ message: 'Event created successfully', event });
     } catch (error) {
       console.error('Error creating event:', error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: 'Error creating event', error });
     }
-  };    
-
-// Get all events (for Admin Dashboard)
-exports.getEvents = async (req, res) => {
-  try {
-    const events = await Event.find().populate('volunteers'); // This fetches volunteers as well
-    res.json(events);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching events', error });
-  }
-};
+  };
+  
+  // Function to get all events from the database
+  exports.getAllEvents = async (req, res) => {
+    try {
+      const events = await Event.find(); // Fetch all events
+      res.json(events); // Return events as JSON
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching events', error });
+    }
+  }; 
 
 // Get volunteers assigned to an event (for Admin Dashboard)
 exports.getVolunteersForEvent = async (req, res) => {
