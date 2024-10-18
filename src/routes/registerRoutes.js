@@ -19,6 +19,7 @@ router.post('/register', async (req, res) => {
     // Check if registering as admin
     if (role === 'admin') {
       const isAdmin = await Admin.findOne({ email });
+      console.log('Admin check:', isAdmin); // Add this for debugging
       if (!isAdmin) {
         return res.status(400).json({ message: 'Not authorized to register as admin' });
       }
@@ -32,7 +33,7 @@ router.post('/register', async (req, res) => {
     user = new User({
       email,
       password: hashedPassword,
-      role
+      role,
     });
 
     await user.save();
@@ -45,7 +46,8 @@ router.post('/register', async (req, res) => {
     res.status(201).json({ token });
 
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Registration Error:', error); // Log any error to the console
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -70,7 +72,8 @@ router.post('/login', async (req, res) => {
 
     res.json({ token });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+    console.error('Login Error:', error); // Log any error to the console
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

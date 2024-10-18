@@ -1,3 +1,4 @@
+//adminModel.js
 const mongoose = require('mongoose');
 
 // Admin email schema (for manually added admin emails)

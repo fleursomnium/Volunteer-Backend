@@ -1,51 +1,36 @@
+// userController.js
 const User = require('../models/userModel');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
-// Register new user
-exports.register = async (req, res) => {
-  const { name, email, password } = req.body;
-  try {
-    const user = new User({ name, email, password });
-    await user.save();
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error registering user', error });
-  }
-};
-
-// Login user
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error });
-  }
-};
-
-// Get user profile
-exports.getUserProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching user profile', error });
-  }
-};
 
 // Update user profile
 exports.updateUserProfile = async (req, res) => {
+  const { userId } = req.params;
+  const { firstName, lastName, address1, address2, city, state, zipcode, preferences, skills, dates, time } = req.body;
+
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          firstName,
+          lastName,
+          address1,
+          address2,
+          city,
+          state,
+          zipcode,
+          preferences,
+          skills,
+          dates,
+          time,
+        },
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     res.json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: 'Error updating profile', error });

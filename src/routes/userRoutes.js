@@ -1,9 +1,10 @@
+userRoutes.js
+
 const express = require('express');
-const { updateUserProfile, getUserProfile } = require('../controllers/userController');
+const { updateUserProfile } = require('../controllers/userController'); // Only need update function here
 const router = express.Router();
 
-router.put('/:userId', updateUserProfile);
-router.get('/:userId', getUserProfile);
+router.put('/:userId', updateUserProfile); // Make sure the frontend sends the correct userId in the URL
 
 module.exports = router;
 

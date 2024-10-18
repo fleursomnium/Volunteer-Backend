@@ -1,18 +1,24 @@
+//server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+// Route imports
 const registerRoutes = require('./src/routes/registerRoutes');
 const eventRoutes = require('./src/routes/eventRoutes');
 const userRoutes = require('./src/routes/userRoutes'); // For user profile updates/retrieval
 const volunteerDashboardRoutes = require('./src/routes/volunteerDashRoutes');
 const volunteerHistoryRoutes = require('./src/routes/volunteerHistoryRoutes');
 
+// Create Express app
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Your frontend URL
+  credentials: true,
+}));
 app.use(express.json());
 
 // Routes
@@ -28,10 +34,11 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.log(err));
 
 // Start the server on port 4000
-const port = process.env.PORT || 4000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
+
 
 
 
