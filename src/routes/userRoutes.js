@@ -1,4 +1,4 @@
-userRoutes.js
+//userRoutes.js
 
 const express = require('express');
 const { updateUserProfile } = require('../controllers/userController'); // Only need update function here

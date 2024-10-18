@@ -10,6 +10,7 @@ const eventRoutes = require('./src/routes/eventRoutes');
 const userRoutes = require('./src/routes/userRoutes'); // For user profile updates/retrieval
 const volunteerDashboardRoutes = require('./src/routes/volunteerDashRoutes');
 const volunteerHistoryRoutes = require('./src/routes/volunteerHistoryRoutes');
+const authRoutes = require('./src/routes/authRoutes');
 
 // Create Express app
 const app = express();
@@ -26,7 +27,8 @@ app.use('/api/auth', registerRoutes); // Handles login and registration
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/volunteer-dashboard', volunteerDashboardRoutes);
-app.use('/api/volunteer-history', volunteerHistoryRoutes);
+app.use('/api/volunteer-history', volunteerHistoryRoutes); // Add volunteer history-related routes
+app.use('/api/auth', authRoutes);  // This will handle login and auth-related routes
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
