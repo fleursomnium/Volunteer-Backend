@@ -1,9 +1,9 @@
 const express = require('express');
-const { registerUser } = require('../controllers/userController');  // Import registerUser
-
+const { updateUserProfile, getUserProfile } = require('../controllers/userController');
 const router = express.Router();
 
-router.post('/register', registerUser);  // Use registerUser as the callback function
+router.put('/:userId', updateUserProfile);
+router.get('/:userId', getUserProfile);
 
 module.exports = router;
 

@@ -1,12 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const userRoutes = require('./src/routes/userRoutes');
-const eventRoutes = require('./src/routes/eventRoutes');
-const volunteerHistoryRoutes = require('./src/routes/volunteerHistory');
+require('dotenv').config();
 
-dotenv.config();
+const registerRoutes = require('./src/routes/registerRoutes');
+const eventRoutes = require('./src/routes/eventRoutes');
+const userRoutes = require('./src/routes/userRoutes'); // For user profile updates/retrieval
+const volunteerDashboardRoutes = require('./src/routes/volunteerDashRoutes');
+const volunteerHistoryRoutes = require('./src/routes/volunteerHistoryRoutes');
 
 const app = express();
 
@@ -14,23 +15,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-console.log('MongoDB URI:', process.env.MONGO_URI); // Temporary logging for debugging
-
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
 // Routes
-app.use('/api/users', userRoutes);
+app.use('/api/auth', registerRoutes); // Handles login and registration
 app.use('/api/events', eventRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/volunteer-dashboard', volunteerDashboardRoutes);
 app.use('/api/volunteer-history', volunteerHistoryRoutes);
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log(err));
 
-
-
+// Start the server on port 4000
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
 
 
 

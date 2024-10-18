@@ -1,53 +1,24 @@
 const Event = require('../models/eventModel');
 
-const createEvent = async (req, res, next) => {
+exports.createEvent = async (req, res) => {
+  const { name, description, location, date, requiredSkills, urgency } = req.body;
   try {
-    const {
-      eventName,
-      eventDescription,
-      address1,
-      address2,
-      city,
-      state,
-      zipcode,
-      urgency,
-      skills,
-      dates,
-      time,
-    } = req.body;
-
-    // Validation check for required fields
-    if (!eventName || !eventDescription || !address1 || !city || !state || !zipcode || !dates || !time) {
-      return res.status(400).json({ message: "Missing required fields." });
-    }
-
-    // Create new event
-    const newEvent = new Event({
-      eventName,
-      description: eventDescription,
-      location: {
-        address: address1,
-        city,
-        state,
-        zipcode,
-      },
-      urgency,
-      requiredSkills: skills,
-      date: dates,
-      time,
-    });
-
-    // Save event to MongoDB
-    const savedEvent = await newEvent.save();
-    res.status(201).json({ message: "Event created successfully.", event: savedEvent });
+    const event = new Event({ name, description, location, date, requiredSkills, urgency });
+    await event.save();
+    res.status(201).json({ message: 'Event created successfully', event });
   } catch (error) {
-    console.error('Error creating event:', error);
-    next(error);
+    res.status(500).json({ message: 'Error creating event', error });
   }
 };
 
-module.exports = { createEvent };
-
+exports.getEvents = async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.json(events);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching events', error });
+  }
+};
 
 
 

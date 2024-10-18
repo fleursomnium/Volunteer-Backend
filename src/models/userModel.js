@@ -1,24 +1,25 @@
 const mongoose = require('mongoose');
 
-// Define a User schema
 const userSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  address1: { type: String, required: true },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  zipcode: { type: String, required: true },
-  preferences: { type: String },
-  skills: { type: [String] },
-  dates: { type: [Date] },
-  time: { type: String },
-  createdAt: { type: Date, default: Date.now }
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ['volunteer', 'admin'], // Only 'volunteer' or 'admin'
+    default: 'volunteer',
+  }
 });
 
-// Create the User model
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;
+
 
 
 
