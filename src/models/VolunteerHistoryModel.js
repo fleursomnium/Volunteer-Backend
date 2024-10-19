@@ -1,4 +1,4 @@
-//VolunteerHistoryModel.js
+//src\models\VolunteerHistoryModel.js
 const mongoose = require('mongoose');
 
 const VolunteerHistorySchema = new mongoose.Schema({

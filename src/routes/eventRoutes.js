@@ -1,15 +1,11 @@
-//eventRoutes.js
+//src\routes\eventRoutes.js
 const express = require('express');
+const { createEvent, getEvents, updateEventRSVP } = require('../controllers/eventController');
+const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
-const eventController = require('../controllers/eventController');
 
-// Create event
-router.post('/', eventController.createEvent);
-
-// Delete event
-router.delete('/:id', eventController.deleteEvent);
-
-// Manage volunteers
-router.put('/:eventId/:volunteerId', eventController.manageVolunteers);
+router.post('/', protect, createEvent);
+router.get('/', protect, getEvents);
+router.put('/:eventId/rsvp', protect, updateEventRSVP);
 
 module.exports = router;

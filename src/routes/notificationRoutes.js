@@ -1,7 +1,7 @@
 //src\routes\notificationRoutes.js
 const express = require('express');
 const router = express.Router();
-const Event = require('../models/EventModel');
+const Event = require('../models/eventModel');
 
 // Get notifications for new events
 router.get('/', async (req, res) => {

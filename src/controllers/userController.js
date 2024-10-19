@@ -1,4 +1,5 @@
 // src\controllers\userController.js
+// src/controllers/userController.js
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -16,36 +17,28 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// User Login
-exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
+// Get User Profile by ID
+exports.getUserProfile = async (req, res) => {
+  const { id } = req.params;
   try {
-    // Find the user by email
-    const user = await User.findOne({ email });
+    const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
-    // Check if the password is correct
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
-    // Create JWT token
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // Send the token to the frontend
-    res.status(200).json({ token });
+    res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ message: 'Error logging in', error: err });
+    res.status(500).json({ message: 'Error fetching user data', error: err });
   }
 };
 
 // Update User Profile
 exports.updateUserProfile = async (req, res) => {
-  const { id } = req.params;
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     res.status(200).json(updatedUser);
   } catch (err) {
-    res.status(500).json({ message: 'Error updating profile', error: err });
+    res.status(500).json({ message: 'Error updating profile', error: err.message });
   }
 };
 
@@ -61,15 +54,43 @@ exports.updateAvailability = async (req, res) => {
   }
 };
 
-// Get User Profile by ID
-exports.getUserProfile = async (req, res) => {
-  const { id } = req.params;
+// User Login
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    
-    res.status(200).json(user);  // Return user data
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(200).json({ token });
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching user data', error: err });
+    res.status(500).json({ message: 'Error logging in', error: err.message });
+  }
+};
+
+// Volunteer Dashboard
+exports.getVolunteerDashboard = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming you use middleware to get the logged-in user
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Fetch relevant data for the volunteer (e.g., events)
+    const events = []; // Add event fetching logic if needed
+
+    res.status(200).json({ user, events });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
   }
 };
