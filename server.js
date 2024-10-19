@@ -1,4 +1,4 @@
-//server.js
+//server.js 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -7,7 +7,7 @@ require('dotenv').config();
 // Route imports
 const registerRoutes = require('./src/routes/registerRoutes');
 const eventRoutes = require('./src/routes/eventRoutes');
-const userRoutes = require('./src/routes/userRoutes'); // For user profile updates/retrieval
+const userRoutes = require('./src/routes/userRoutes');
 const volunteerDashboardRoutes = require('./src/routes/volunteerDashRoutes');
 const volunteerHistoryRoutes = require('./src/routes/volunteerHistoryRoutes');
 const authRoutes = require('./src/routes/authRoutes');
@@ -17,18 +17,17 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Your frontend URL
-  credentials: true,
+  origin: 'http://localhost:3000' // Your frontend URL
 }));
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', registerRoutes); // Handles login and registration
+app.use('/api/register', registerRoutes);  // Handles login and registration
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/volunteer-dashboard', volunteerDashboardRoutes);
-app.use('/api/volunteer-history', volunteerHistoryRoutes); // Add volunteer history-related routes
-app.use('/api/auth', authRoutes);  // This will handle login and auth-related routes
+app.use('/api/volunteer-history', volunteerHistoryRoutes);  // Add volunteer history-related routes
+app.use('/api/auth', authRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)

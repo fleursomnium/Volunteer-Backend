@@ -1,14 +1,17 @@
 // volunteerHistoryRoutes.js
 const express = require('express');
 const {
-  getVolunteerHistory,    // Add missing function imports here
-  rsvpForEvent,           // Make sure RSVP and other functions are properly imported
-  getVolunteersForEvent
+  getVolunteersForEvent,
+  getAllVolunteers,
+  addVolunteerToEvent,
+  removeVolunteerFromEvent,
 } = require('../controllers/volunteerHistoryController');
 const router = express.Router();
 
-router.get('/:volunteerId', getVolunteerHistory);  // Route to get history for a volunteer
-router.post('/rsvp', rsvpForEvent);                // Route for RSVP functionality
-router.get('/event/:eventId', getVolunteersForEvent);  // Route to get volunteers for an event
+router.get('/event/:eventId', getVolunteersForEvent);  // Fetch volunteers for event
+router.get('/all', getAllVolunteers);  // Fetch all volunteers
+router.post('/add', addVolunteerToEvent);  // Add volunteer to event
+router.post('/remove', removeVolunteerFromEvent);  // Remove volunteer from event
 
 module.exports = router;
+

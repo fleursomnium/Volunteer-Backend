@@ -1,13 +1,14 @@
 //userRoutes.js
-
 const express = require('express');
-const { updateUserProfile } = require('../controllers/userController'); // Only need update function here
+const { updateUserProfile } = require('../controllers/userController');
+const verifyToken = require('../middleware/authMiddleware'); // Import middleware
 const router = express.Router();
 
-router.put('/:userId', updateUserProfile); // Make sure the frontend sends the correct userId in the URL
+// Apply verifyToken middleware to protect this route
+router.put('/profile/:userId', verifyToken, updateUserProfile);
+router.put('/:userId', updateUserProfile);  // Update user profile
 
 module.exports = router;
-
 
 
 

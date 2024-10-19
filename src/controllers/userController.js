@@ -1,18 +1,17 @@
 // userController.js
-const User = require('../models/userModel');
-
-// Update user profile
 exports.updateUserProfile = async (req, res) => {
   const { userId } = req.params;
+  console.log('UserId:', userId);
+  console.log('Request body:', req.body);
+
   const { firstName, lastName, address1, address2, city, state, zipcode, preferences, skills, dates, time } = req.body;
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
+    const updatedProfile = await Profile.findOneAndUpdate(
+      { user: userId },  // Find the profile by user ID
       {
         $set: {
-          firstName,
-          lastName,
+          fullName: `${firstName} ${lastName}`,
           address1,
           address2,
           city,
@@ -20,139 +19,20 @@ exports.updateUserProfile = async (req, res) => {
           zipcode,
           preferences,
           skills,
-          dates,
-          time,
+          availability: dates,
+          time
         },
       },
-      { new: true } // Return the updated document
+      { new: true } // Return the updated profile document
     );
 
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!updatedProfile) {
+      return res.status(404).json({ message: 'Profile not found' });
     }
 
-    res.json(updatedUser);
+    res.json(updatedProfile);
   } catch (error) {
+    console.error('Error updating profile:', error);
     res.status(500).json({ message: 'Error updating profile', error });
   }
 };
-
-
-
-// const User = require("../models/userModel");
-// const fileHandler = require("../utils/fileHandler");
-// const path = require("path");
-
-// const USERS_FILE = path.join(__dirname, "../data/users.json");
-
-// const createUser = async (req, res, next) => {
-//   try {
-//     const {
-//       firstName,
-//       lastName,
-//       address1,
-//       address2,
-//       city,
-//       state,
-//       zipcode,
-//       preferences,
-//       skills,
-//       dates,
-//       time,
-//     } = req.body;
-
-//     if (!firstName || !lastName || !address1 || !city || !state || !zipcode) {
-//       return res
-//         .status(400)
-//         .json({
-//           message:
-//             "Required fields: firstName, lastName, address1, city, state, and zipcode.",
-//         });
-//     }
-
-//     const newUser = new User({
-//       firstName,
-//       lastName,
-//       address1,
-//       address2,
-//       city,
-//       state,
-//       zipcode,
-//       preferences,
-//       skills,
-//       dates,
-//       time,
-//     });
-
-//     const users = await fileHandler.readJSON(USERS_FILE);
-//     users.push(newUser);
-
-//     await fileHandler.writeJSON(USERS_FILE, users);
-
-//     res
-//       .status(201)
-//       .json({ message: "User created successfully.", user: newUser });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// module.exports = {
-//   createUser,
-// };
-
-// import User from "../models/userModel.js"; // Ensure that userModel.js is using named export
-// import { readJSON, writeJSON } from "../utils/fileHandler.js"; // Use named imports
-// import path from "path";
-
-// const USERS_FILE = path.join(path.dirname(import.meta.url), "../data/users.json"); // Adjust path resolution
-
-// const createUser = async (req, res, next) => {
-//   try {
-//     const {
-//       firstName,
-//       lastName,
-//       address1,
-//       address2,
-//       city,
-//       state,
-//       zipcode,
-//       preferences,
-//       skills,
-//       dates,
-//       time,
-//     } = req.body;
-
-//     if (!firstName || !lastName || !address1 || !city || !state || !zipcode) {
-//       return res.status(400).json({
-//         message: "Required fields: firstName, lastName, address1, city, state, and zipcode.",
-//       });
-//     }
-
-//     const newUser = new User({
-//       firstName,
-//       lastName,
-//       address1,
-//       address2,
-//       city,
-//       state,
-//       zipcode,
-//       preferences,
-//       skills,
-//       dates,
-//       time,
-//     });
-
-//     const users = await readJSON(USERS_FILE); // Call readJSON directly
-//     users.push(newUser);
-
-//     await writeJSON(USERS_FILE, users); // Call writeJSON directly
-
-//     res.status(201).json({ message: "User created successfully.", user: newUser });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// export { createUser }; // Use named export
-
