@@ -1,27 +1,22 @@
+// volunteerRoutes.js
 import express from 'express';
+import { getVolunteers, addVolunteer, updateVolunteer, deleteVolunteer } from '../controllers/volunteerController.js';
 
 const router = express.Router();
 
-// Hardcoded volunteer data to simulate a database
-const volunteerData = [
-  {
-    name: "John Doe",
-    skills: ["python", "leadership"],
-    preferences: "Lorem ipsum dolor sit amet..."
-  },
-  {
-    name: "Jane Smith",
-    skills: ["javascript", "management"],
-    preferences: "Lorem ipsum dolor sit amet..."
-  }
-  // Add more volunteers as needed
-];
+// Route to get all volunteers
+router.get('/', getVolunteers);
 
-// Route to get volunteer data
-router.get('/', (req, res) => {
-  res.json(volunteerData);
-});
+// Route to add a new volunteer
+router.post('/', addVolunteer);
+
+// Route to update a volunteer by ID
+router.put('/:id', updateVolunteer);
+
+// Route to delete a volunteer by ID
+router.delete('/:id', deleteVolunteer);
 
 export default router;
+
 
   
