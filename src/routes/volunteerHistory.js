@@ -1,4 +1,4 @@
-import express from 'express';
+const express = require('express');
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -6,7 +6,7 @@ router.get('/', (req, res) => {
     {
       id: 1,
       name: 'Event 1',
-      description: 'Dhjabschjvahjsbcjhavschjvt 1',
+      description: 'Description of event 1',
       location: 'Location 1',
       date: '2024-09-11',
       urgency: 'high',
@@ -27,4 +27,4 @@ router.get('/', (req, res) => {
   res.json(events);
 });
 
-export default router;
+module.exports = router;
