@@ -1,99 +1,933 @@
-const { registerUser } = require('../controllers/userController'); // Adjust path as needed
+// const { updateUserProfile } = require('../controllers/userController');
+// const User = require('../models/userModel');
+
+// jest.mock('../models/userModel');
+
+// const req = {
+//     params: { userId: '123' },
+//     body: {
+//         firstName: 'John',
+//         lastName: 'Doe',
+//         address1: '123 Main St',
+//         address2: 'Apt 4B',
+//         city: 'Houston',
+//         state: 'TX',
+//         zipcode: '77001',
+//         preferences: ['preference1'],
+//         skills: ['skill1', 'skill2'],
+//         dates: ['2024-10-19']
+//     }
+// };
+
+// const res = {
+//     status: jest.fn(() => res),
+//     json: jest.fn(),
+// };
+
+// afterEach(() => {
+//     jest.clearAllMocks();
+// });
+
+// describe('UserController - updateUserProfile', () => {
+//     it('should update the user profile successfully', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(req.body); // Mocking successful update
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User profile updated successfully.',
+//             user: req.body
+//         });
+//     });
+
+//     it('should return 404 if user is not found', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(null); // No user found
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found' // Match the exact format
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Internal server error',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+
+// const { updateUserProfile } = require('../controllers/userController');
+// const User = require('../models/userModel');
+
+// jest.mock('../models/userModel');
+
+// const req = {
+//     params: { userId: '123' },
+//     body: {
+//         firstName: 'John',
+//         lastName: 'Doe',
+//         address1: '123 Main St',
+//         address2: 'Apt 4B',
+//         city: 'Houston',
+//         state: 'TX',
+//         zipcode: '77001',
+//         preferences: ['preference1'],
+//         skills: ['skill1', 'skill2'],
+//         dates: ['2024-10-19']
+//     }
+// };
+
+// const res = {
+//     status: jest.fn(() => res),
+//     json: jest.fn(),
+// };
+
+// afterEach(() => {
+//     jest.clearAllMocks();
+// });
+
+// describe('UserController - updateUserProfile', () => {
+//     it('should update the user profile successfully', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(req.body); // Mocking successful update
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User profile updated successfully.',
+//             user: req.body
+//         });
+//     });
+
+//     it('should return 404 if user is not found', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(null); // No user found
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found'
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Error updating profile',
+//             error: expect.any(Error)
+//         });
+//     });
+// });  7:34
+// userController.test.js
+
+// const { updateUserProfile } = require('../controllers/userController');
+// const User = require('../models/userModel');
+
+// jest.mock('../models/userModel');
+
+// describe('UserController - updateUserProfile', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             params: { userId: '123' },
+//             body: {
+//                 firstName: 'John',
+//                 lastName: 'Doe',
+//                 address1: '123 Main St',
+//                 address2: 'Apt 4B',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77001',
+//                 preferences: ['preference1'],
+//                 skills: ['skill1', 'skill2'],
+//                 dates: ['2024-10-19'],
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should update the user profile successfully', async () => {
+//         // Mock successful update
+//         User.findByIdAndUpdate.mockResolvedValue({
+//             _id: '123',
+//             ...req.body,
+//         });
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User profile updated successfully.',
+//             user: {
+//                 _id: '123',
+//                 ...req.body,
+//             },
+//         });
+//     });
+
+//     it('should return 404 if the user is not found', async () => {
+//         // Mock user not found
+//         User.findByIdAndUpdate.mockResolvedValue(null);
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found.',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Mock server error
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Error updating profile',
+//             error: 'Database error',
+//         });
+//     });
+// }); 8:00
+const { updateUserProfile } = require('../controllers/userController');
 const User = require('../models/userModel');
-const Admin = require('../models/adminModel');
-const bcrypt = require('bcryptjs');
 
-// Mock the User and Admin models and bcrypt
 jest.mock('../models/userModel');
-jest.mock('../models/adminModel');
-jest.mock('bcryptjs');
 
-const mockReq = (data) => ({
-    body: data,
-});
-
-const mockRes = () => {
-    const res = {};
-    res.status = jest.fn().mockReturnValue(res);
-    res.json = jest.fn().mockReturnValue(res);
-    return res;
-};
-
-describe('registerUser', () => {
-    let req;
-    let res;
+describe('UserController - updateUserProfile', () => {
+    let req, res;
 
     beforeEach(() => {
-        req = mockReq({
-            email: 'test@example.com',
-            password: 'password123',
-            role: 'volunteer',
+        req = {
+            params: { userId: '123' },
+            body: {
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Main St',
+                address2: 'Apt 4B',
+                city: 'Houston',
+                state: 'TX',
+                zipcode: '77001',
+                preferences: ['preference1'],
+                skills: ['skill1', 'skill2'],
+                dates: ['2024-10-19'],
+            },
+        };
+
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        };
+
+        jest.clearAllMocks();
+    });
+
+    it('should update the user profile successfully', async () => {
+        // Mock successful update
+        User.findByIdAndUpdate.mockResolvedValue({
+            _id: '123',
+            ...req.body,
         });
-        res = mockRes();
-    });
 
-    afterEach(() => {
-        jest.clearAllMocks(); // Clears the mocks after each test
-    });
+        await updateUserProfile(req, res);
 
-    it('should return 400 if the user already exists', async () => {
-        User.findOne.mockResolvedValue({ email: 'test@example.com' }); // Simulate existing user
-
-        await registerUser(req, res);
-
-        expect(User.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({ message: 'User already exists with this email' });
-    });
-
-    it('should return 403 if the role is admin and the email is not in the admin list', async () => {
-        req.body.role = 'admin';
-        User.findOne.mockResolvedValue(null); // Simulate user not found
-        Admin.findOne.mockResolvedValue(null); // Simulate admin not found
-
-        await registerUser(req, res);
-
-        expect(Admin.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
-        expect(res.status).toHaveBeenCalledWith(403);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Unauthorized: email not allowed for admin registration' });
-    });
-
-    it('should hash the password and create a new user', async () => {
-        User.findOne.mockResolvedValue(null); // Simulate no existing user
-        Admin.findOne.mockResolvedValue({ email: 'test@example.com' }); // Simulate valid admin (if role is admin)
-        bcrypt.hash.mockResolvedValue('hashedPassword123'); // Mock password hashing
-
-        // Mock the save method on the User instance
-        const mockUserSave = jest.fn().mockResolvedValue(true);
-        User.mockImplementation(() => ({
-            save: mockUserSave,
-        }));
-
-        await registerUser(req, res);
-
-        expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
-        expect(mockUserSave).toHaveBeenCalled(); // Ensure the save function was called
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({
-            message: 'User registered successfully',
-            role: 'volunteer',
+            message: 'User profile updated successfully.',
+            user: {
+                _id: '123',
+                ...req.body,
+            },
         });
     });
 
-    it('should handle errors and return 500 status code', async () => {
-        const error = new Error('Internal Server Error');
-        User.findOne.mockRejectedValue(error); // Simulate an error
+    it('should return 404 if the user is not found', async () => {
+        // Mock user not found
+        User.findByIdAndUpdate.mockResolvedValue(null);
 
-        await registerUser(req, res);
+        await updateUserProfile(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({
+            message: 'User not found.',  // Make sure to match punctuation
+        });
+    });
+
+    it('should return 500 if there is a server error', async () => {
+        // Mock server error
+        User.findByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+
+        await updateUserProfile(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({
-            message: 'Internal server error during registration',
-            error,
+            message: 'Error updating profile',
+            error: 'Database error',  // If you want to match the string error, leave this
         });
     });
 });
 
+
+// const { updateUserProfile } = require('../controllers/userController');7:42
+// const User = require('../models/userModel');
+
+// jest.mock('../models/userModel');
+
+// const req = {
+//   params: { userId: '123' },
+//   body: {
+//     firstName: 'John',
+//     lastName: 'Doe',
+//     address1: '123 Main St',
+//     address2: 'Apt 4B',
+//     city: 'Houston',
+//     state: 'TX',
+//     zipcode: '77001',
+//     preferences: ['preference1'],
+//     skills: ['skill1', 'skill2'],
+//     dates: ['2024-10-19'] // Ensure all required fields are present
+//   }
+// };
+
+// const res = {
+//   status: jest.fn(() => res),
+//   json: jest.fn(),
+// };
+
+// afterEach(() => {
+//   jest.clearAllMocks();
+// });
+
+// describe('UserController - updateUserProfile', () => {
+//   it('should update the user profile successfully', async () => {
+//     // Ensure the mock returns the body as expected for a successful update
+//     User.findByIdAndUpdate.mockResolvedValue(req.body); 
+
+//     await updateUserProfile(req, res);
+
+//     expect(res.status).toHaveBeenCalledWith(200);
+//     expect(res.json).toHaveBeenCalledWith({
+//       message: 'User profile updated successfully.',
+//       user: req.body
+//     });
+//   });
+
+//   it('should return 404 if user is not found', async () => {
+//     // Mock the response to return null, simulating a user not found scenario
+//     User.findByIdAndUpdate.mockResolvedValue(null);
+
+//     await updateUserProfile(req, res);
+
+//     expect(res.status).toHaveBeenCalledWith(404);
+//     expect(res.json).toHaveBeenCalledWith({
+//       message: 'User not found'
+//     });
+//   });
+
+//   it('should return 500 if there is a server error', async () => {
+//     // Mock a rejected promise to simulate a server error
+//     User.findByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+
+//     await updateUserProfile(req, res);
+
+//     expect(res.status).toHaveBeenCalledWith(500);
+//     expect(res.json).toHaveBeenCalledWith({
+//       message: 'Error updating profile',
+//       error: expect.any(Error)
+//     });
+//   });
+// });
+
+
+// const { updateUserProfile } = require('../controllers/userController'); 7:37
+// const User = require('../models/userModel');
+
+// jest.mock('../models/userModel');
+
+// const req = {
+//     params: { userId: '123' },
+//     body: {
+//         firstName: 'John',
+//         lastName: 'Doe',
+//         address1: '123 Main St',
+//         address2: 'Apt 4B',
+//         city: 'Houston',
+//         state: 'TX',
+//         zipcode: '77001',
+//         preferences: ['preference1'],
+//         skills: ['skill1', 'skill2'],
+//         dates: ['2024-10-19']
+//     }
+// };
+
+// const res = {
+//     status: jest.fn(() => res),
+//     json: jest.fn(),
+// };
+
+// afterEach(() => {
+//     jest.clearAllMocks();
+// });
+
+// describe('UserController - updateUserProfile', () => {
+//     it('should update the user profile successfully', async () => {
+//         // Mocking successful update
+//         User.findByIdAndUpdate.mockResolvedValue(req.body);
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User profile updated successfully.',
+//             user: req.body
+//         });
+//     });
+
+//     it('should return 404 if user is not found', async () => {
+//         // Mocking user not found
+//         User.findByIdAndUpdate.mockResolvedValue(null);
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found'
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Mocking a rejected promise to simulate a server error
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Error updating profile',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+// const { updateUserProfile } = require('../controllers/userController'); 7:36
+// const User = require('../models/userModel');
+
+// jest.mock('../models/userModel');
+
+// const req = {
+//     params: { userId: '123' },
+//     body: {
+//         firstName: 'John',
+//         lastName: 'Doe',
+//         address1: '123 Main St',
+//         address2: 'Apt 4B',
+//         city: 'Houston',
+//         state: 'TX',
+//         zipcode: '77001',
+//         preferences: ['preference1'],
+//         skills: ['skill1', 'skill2'],
+//         dates: ['2024-10-19']
+//     }
+// };
+
+// const res = {
+//     status: jest.fn(() => res),
+//     json: jest.fn(),
+// };
+
+// afterEach(() => {
+//     jest.clearAllMocks();
+// });
+
+// describe('UserController - updateUserProfile', () => {
+//     it('should update the user profile successfully', async () => {
+//         // Mocking successful update to return the updated user object
+//         User.findByIdAndUpdate.mockResolvedValue(req.body);
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User profile updated successfully.',
+//             user: req.body
+//         });
+//     });
+
+//     it('should return 404 if user is not found', async () => {
+//         // Mocking user not found by returning null
+//         User.findByIdAndUpdate.mockResolvedValue(null);
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found'
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Mocking a rejected promise to simulate a server error
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Database error'));
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Error updating profile',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+
+
+
+// const { updateUserProfile } = require('../controllers/userController'); 6:49
+// const User = require('../models/userModel');
+
+// // Mock the User model
+// jest.mock('../models/userModel');
+
+// describe('UserController - updateUserProfile', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             params: { userId: '12345' },
+//             body: {
+//                 firstName: 'John',
+//                 lastName: 'Doe',
+//                 address1: '123 Main St',
+//                 address2: 'Apt 4B',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77001',
+//                 preferences: ['preference1'],
+//                 skills: ['skill1', 'skill2'],
+//                 dates: ['2024-10-19'],
+//             }
+//         };
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+//         jest.clearAllMocks();
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body = {}; // Simulate missing required fields
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'All fields are required.'
+//         });
+//     });
+
+//     it('should update the user profile successfully', async () => {
+//         // Mock successful update
+//         User.findByIdAndUpdate.mockResolvedValue(req.body);
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith(req.body);
+//     });
+
+//     it('should return 404 if the user is not found', async () => {
+//         // Simulate user not found
+//         User.findByIdAndUpdate.mockResolvedValue(null);
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Simulate a server error
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Internal server error'));
+
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Error updating profile',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+// const { updateUserProfile } = require('../controllers/userController');
+// const User = require('../models/userModel');
+
+// // Mock the User model
+// jest.mock('../models/userModel');
+
+// describe('UserController - updateUserProfile', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             params: { userId: '12345' },
+//             body: {
+//                 firstName: 'John',
+//                 lastName: 'Doe',
+//                 address1: '123 Main St',
+//                 address2: 'Apt 4B',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77001',
+//                 preferences: ['preference1'],
+//                 skills: ['skill1', 'skill2'],
+//                 dates: ['2024-10-19'],
+//             }
+//         };
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+//         jest.clearAllMocks();
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body = {}; // Simulate missing required fields
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'All fields are required.'
+//         });
+//     });
+
+//     it('should update the user profile successfully', async () => {
+//         // Mock the resolved value of findByIdAndUpdate
+//         User.findByIdAndUpdate.mockResolvedValue(req.body); // Simulate successful update
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith(req.body);
+//     });
+
+//     it('should return 404 if the user is not found', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(null); // Simulate user not found
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Simulate a server error by rejecting the promise
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Internal server error'));
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Error updating profile',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+//6:28// const { updateUserProfile } = require('../controllers/userController');
+// const User = require('../models/userModel');
+
+// // Mock the User model
+// jest.mock('../models/userModel');
+
+// describe('UserController - updateUserProfile', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             params: { userId: '12345' },
+//             body: {
+//                 firstName: 'John',
+//                 lastName: 'Doe',
+//                 address1: '123 Main St',
+//                 address2: 'Apt 4B',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77001',
+//                 preferences: ['preference1'],
+//                 skills: ['skill1', 'skill2'],
+//                 dates: ['2024-10-19'],
+//             }
+//         };
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+//         jest.clearAllMocks();
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body = {}; // Simulate missing required fields
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'All fields are required.'
+//         });
+//     });
+
+//     it('should update the user profile successfully', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(req.body); // Simulate successful update
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith(req.body);
+//     });
+
+//     it('should return 404 if the user is not found', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(null); // Simulate user not found
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Internal server error')); // Simulate a server error
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Error updating profile',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+// const { updateUserProfile } = require('../controllers/userController'); 6:26
+// const User = require('../models/userModel');
+
+// // Mock the User model
+// jest.mock('../models/userModel');
+
+// describe('UserController - updateUserProfile', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             params: { id: '12345' },
+//             body: { name: 'John Doe', email: 'john.doe@example.com' }
+//         };
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+//         jest.clearAllMocks();
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body = {}; // Incomplete data
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'All fields are required.'
+//         });
+//     });
+
+//     it('should update the user profile successfully', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(req.body); // Mock successful update
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User profile updated successfully.',
+//             user: req.body
+//         });
+//     });
+
+//     it('should return 404 if the user is not found', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(null); // Simulate user not found
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(404);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User not found.'
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Internal server error')); // Simulate a server error
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Internal server error',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+// const { updateUserProfile } = require('../controllers/userController'); best 
+// const User = require('../models/userModel');
+
+// // Mock the User model
+// jest.mock('../models/userModel');
+
+// describe('UserController - updateUserProfile', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             params: { id: '12345' },
+//             body: { name: 'John Doe', email: 'john.doe@example.com' }
+//         };
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+//         jest.clearAllMocks();
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body = {}; // Incomplete data
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'All fields are required.'
+//         });
+//     });
+
+//     it('should update the user profile successfully', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(req.body);
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(200);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'User profile updated successfully.',
+//             user: req.body
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Internal server error'));
+//         await updateUserProfile(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Internal server error',
+//             error: expect.any(Error)
+//         });
+//     });
+// });
+
+
+// const request = require('supertest');
+// const express = require('express');
+// const userController = require('../controllers/userController');
+// const User = require('../models/userModel');
+
+// // Mock Express app
+// const app = express();
+// app.use(express.json());
+// app.put('/api/users/:userId', userController.updateUserProfile);
+
+// // Mock the User model
+// jest.mock('../models/userModel');
+
+// describe('UserController - updateUserProfile', () => {
+//     const userId = '1234567890abcdef12345678'; // Sample user ID
+//     const validUserData = {
+//         firstName: 'John',
+//         lastName: 'Doe',
+//         address1: '123 Main St',
+//         address2: 'Apt 4B',
+//         city: 'Houston',
+//         state: 'TX',
+//         zipcode: '77001',
+//         preferences: 'vegetarian',
+//         skills: ['coding', 'teaching'],
+//         dates: '2023-10-17',
+       
+//     };
+
+//     afterEach(() => {
+//         jest.clearAllMocks(); // Clear mocks between tests
+//     });
+
+//     test('should return 400 if required fields are missing', async () => {
+//         const incompleteData = {
+//             firstName: 'John',
+//             lastName: 'Doe',
+//             preferences: 'vegetarian',
+//             skills: [],
+//             dates: '2023-10-17',
+           
+//         };
+
+//         const response = await request(app)
+//             .put(`/api/users/${userId}`)
+//             .send(incompleteData);
+
+//         expect(response.status).toBe(400);
+//         expect(response.body.message).toBe('All fields are required.');
+//     });
+
+//     test('should return 404 if user is not found', async () => {
+//         User.findByIdAndUpdate.mockResolvedValue(null); // Simulate user not found
+
+//         const response = await request(app)
+//             .put(`/api/users/${userId}`)
+//             .send(validUserData);
+
+//         expect(response.status).toBe(404);
+//         expect(response.body.message).toBe('User not found');
+//     });
+
+//     test('should return 500 if there is a server error', async () => {
+//         User.findByIdAndUpdate.mockRejectedValue(new Error('Server error')); // Simulate server error
+
+//         const response = await request(app)
+//             .put(`/api/users/${userId}`)
+//             .send(validUserData);
+
+//         expect(response.status).toBe(500);
+//         expect(response.body.message).toBe('Error updating profile');
+//         expect(response.body.error).toBeDefined();
+//     });
+
+//     test('should return 200 and updated user profile on success', async () => {
+//         const updatedUser = { ...validUserData, _id: userId };
+//         User.findByIdAndUpdate.mockResolvedValue(updatedUser); // Simulate successful update
+
+//         const response = await request(app)
+//             .put(`/api/users/${userId}`)
+//             .send(validUserData);
+
+//         expect(response.status).toBe(200);
+//         expect(response.body).toEqual(updatedUser);
+//     });
+// });
+//10/19
 // // createUser.test.js gab
 // const { createUser } = require('./userController');
 // const { readJSON, writeJSON } = require('../utils/fileHandler');
@@ -125,7 +959,7 @@ describe('registerUser', () => {
 //                 preferences: 'Any',
 //                 skills: ['Communication', 'Programming'],
 //                 dates: ['2023-10-10', '2023-10-11'],
-//                 time: '10:00',
+//                
 //             },
 //         };
 

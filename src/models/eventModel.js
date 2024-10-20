@@ -12,7 +12,6 @@ const eventSchema = new mongoose.Schema({
     urgency: String,
     requiredSkills: [String],
     date: { type: [Date], required: true },
-    time: { type: String, required: true },
     volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 

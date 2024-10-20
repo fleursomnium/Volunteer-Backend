@@ -1,45 +1,180 @@
-const bcrypt = require('bcryptjs');
+
+
+// // userController.js today.
+// const User = require('../models/userModel');
+
+// // Update user profile
+// exports.updateUserProfile = async (req, res) => {
+//   const { userId } = req.params;
+//   const { firstName, lastName, address1, address2, city, state, zipcode, preferences, skills, dates} = req.body;
+
+//   try {
+//     const updatedUser = await User.findByIdAndUpdate(
+//       userId,
+//       {
+//         $set: {
+//           firstName,
+//           lastName,
+//           address1,
+//           address2,
+//           city,
+//           state,
+//           zipcode,
+//           preferences,
+//           skills,
+//           dates,
+
+//         },
+//       },
+//       { new: true } // Return the updated document
+//     );
+
+//     if (!updatedUser) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     res.json(updatedUser);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error updating profile', error });
+//   }
+// };
+// userController.js
+
 const User = require('../models/userModel');
-const Admin = require('../models/adminModel');
 
-const registerUser = async (req, res) => {
-  const { email, password, role } = req.body;
-
+const updateUserProfile = async (req, res) => {
   try {
-    // Check if the user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists with this email' });
+    const { userId } = req.params;
+    const { firstName, lastName, preferences, skills, dates } = req.body;
+
+    if (!firstName || !lastName || !preferences || !skills || !dates) {
+      return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    // If the role is admin, validate if the email is in the admin list
-    if (role === 'admin') {
-      const adminEmail = await Admin.findOne({ email });
-      if (!adminEmail) {
-        return res.status(403).json({ message: 'Unauthorized: email not allowed for admin registration' });
-      }
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { firstName, lastName, preferences, skills, dates },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create and save the new user
-    const newUser = new User({ email, password: hashedPassword, role });
-    await newUser.save();
-
-    res.status(201).json({ message: 'User registered successfully', role });
+    res.status(200).json({
+      message: 'User profile updated successfully.',
+      user: updatedUser,
+    });
   } catch (error) {
-    console.error('Error during registration:', error); // Log error for debugging
-    res.status(500).json({ message: 'Internal server error during registration', error });
+    console.error('Error updating profile:', error);
+    res.status(500).json({
+      message: 'Error updating profile',
+      error: error.message || 'Internal server error',
+    });
   }
 };
 
-// Define loginUser to prevent undefined error
-const loginUser = async (req, res) => {
-  res.status(200).json({ message: 'Login route not yet implemented' });
+module.exports = {
+  updateUserProfile,
 };
 
-module.exports = { registerUser, loginUser };
+
+
+
+// const User = require('../models/userModel');7:47
+
+// // Update user profile
+// exports.updateUserProfile = async (req, res) => {
+//   const { userId } = req.params;
+//   const { firstName, lastName, preferences, skills, dates } = req.body;
+
+//   // Ensure all required fields are present
+//   if (!firstName || !lastName || !preferences || !skills.length || !dates.length) {
+//     return res.status(400).json({ message: 'All fields are required.' });
+//   }
+
+//   try {
+//     // Try to find and update the user
+//     const updatedUser = await User.findByIdAndUpdate(
+//       userId,
+//       {
+//         $set: {
+//           firstName,
+//           lastName,
+//           preferences,
+//           skills,
+//           dates
+//         },
+//       },
+//       { new: true } // Return the updated document
+//     );
+
+//     // If the user doesn't exist, return 404
+//     if (!updatedUser) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     // Return a success message with the updated user info
+//     res.status(200).json({
+//       message: 'User profile updated successfully.',
+//       user: updatedUser,
+//     });
+//   } catch (error) {
+//     // If there is any other server error, return 500
+//     res.status(500).json({
+//       message: 'Error updating profile',
+//       error: error.message || error,
+//     });
+//   }
+// };
+
+// // userController.js
+
+// const User = require('../models/userModel');7:45
+
+// // Update user profile
+// exports.updateUserProfile = async (req, res) => {
+//   const { userId } = req.params;
+//   const { firstName, lastName, address1, address2, city, state, zipcode, preferences, skills, dates } = req.body;
+
+//   // Check if all required fields are provided
+//   if (!firstName || !lastName || !preferences || !skills.length || !dates ) {
+//     return res.status(400).json({ message: 'All fields are required.' });
+//   }
+
+//   try {
+//     const updatedUser = await User.findByIdAndUpdate(
+//       userId,
+//       {
+//         $set: {
+//           firstName,
+//           lastName,
+//           address1,
+//           address2,
+//           city,
+//           state,
+//           zipcode,
+//           preferences,
+//           skills,
+//           dates,
+         
+//         },
+//       },
+//       { new: true } // Return the updated document
+//     );
+
+//     if (!updatedUser) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     res.json(updatedUser);
+//   } catch (error) {
+//     res.status(500).json({ message: 'Error updating profile', error });
+//   }
+//   console.log(req.body);
+
+// };
+
 
 
 // import User from '../models/userModel.js';  // Use ES module import

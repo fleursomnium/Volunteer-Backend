@@ -1,12 +1,12 @@
-const express = require('express');
-const { createEvent } = require('../controllers/eventController');
 
+const express = require('express');
+const { createEvent, getEvents } = require('../controllers/eventController');
 const router = express.Router();
 
-router.post('/create', createEvent);
+router.post('/', createEvent);
+router.get('/', getEvents);
 
 module.exports = router;
-
 
 
 // import express from 'express';  // Use ES module syntax
