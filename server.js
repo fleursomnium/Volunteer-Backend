@@ -1,3 +1,54 @@
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const cors = require('cors');
+// require('dotenv').config();
+
+// // Route imports
+// const registerRoutes = require('./src/routes/registerRoutes');
+// const eventRoutes = require('./src/routes/eventRoutes');
+// const userRoutes = require('./src/routes/userRoutes');
+// const volunteerDashboardRoutes = require('./src/routes/volunteerDashRoutes');
+// const volunteerHistoryRoutes = require('./src/routes/volunteerHistoryRoutes');
+// const authRoutes = require('./src/routes/authRoutes');
+
+// // Create Express app
+// const app = express();
+
+// // Middleware
+// app.use(cors({
+//   origin: 'http://localhost:3000' // Your frontend URL
+// }));
+// app.use(express.json());
+
+// // Routes
+// app.use('/api/register', registerRoutes);  // Handles login and registration
+// app.use('/api/events', eventRoutes);
+// app.use('/api/users', userRoutes);
+// app.use('/api/volunteer-dashboard', volunteerDashboardRoutes);
+// app.use('/api/volunteer-history', volunteerHistoryRoutes);  // Add volunteer history-related routes
+// app.use('/api/auth', authRoutes);
+
+// // Connect to MongoDB
+// mongoose.connect(process.env.MONGO_URI)
+//   .then(() => console.log('MongoDB Connected'))
+//   .catch(err => console.log(err));
+
+// // Start the server on port 4000
+// const PORT = process.env.PORT || 4000;
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
+// //oct/17
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const userRoutes = require('./src/routes/userRoutes');
+const eventRoutes = require('./src/routes/eventRoutes');
+// const volunteerHistoryRoutes = require('./src/routes/volunteerHistoryRoutes');
+
+
+dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
