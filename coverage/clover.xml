@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< Updated upstream
 <coverage generated="1728934965439" clover="3.2.0">
   <project timestamp="1728934965439" name="All files">
+=======
+<coverage generated="1729385253660" clover="3.2.0">
+  <project timestamp="1729385253660" name="All files">
+>>>>>>> Stashed changes
     <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0" elements="0" coveredelements="0" complexity="0" loc="0" ncloc="0" packages="0" files="0" classes="0"/>
   </project>
 </coverage>
