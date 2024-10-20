@@ -20,17 +20,16 @@ exports.registerUser = async (req, res) => {
     // Save the new user in the database
     const savedUser = await newUser.save();
 
-    // Automatically create an empty profile
+    // Automatically create an empty profile with preferences instead of bio
     const emptyProfile = {
       userId: savedUser._id,  // Use the registered user's ID
       firstName: '',
       lastName: '',
-      bio: '',
+      preferences: '', // Use preferences here
       // Add other profile fields here as needed
     };
 
-    // Save the empty profile (assuming you have a separate profile model or this is part of the user schema)
-    // For now, we'll assume the user schema has these fields as optional, and we're just updating them
+    // Update the user profile with empty values for fields
     await User.findByIdAndUpdate(savedUser._id, { profile: emptyProfile }, { new: true });
 
     res.status(201).json({ message: 'User registered successfully', user: savedUser });
@@ -54,10 +53,24 @@ exports.getUserProfile = async (req, res) => {
 // Update User Profile
 exports.updateUserProfile = async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
+    const { userId } = req.params;  // Extract userId from request parameters
+    const { firstName, lastName, preferences, skills, dates, time } = req.body;
+
+    const updatedProfile = {
+      'profile.firstName': firstName,
+      'profile.lastName': lastName,
+      'profile.preferences': preferences,
+      'profile.skills': skills,
+      'profile.dates': dates,
+      'profile.time': time,
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedProfile, { new: true });
+
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
+
     res.status(200).json(updatedUser);
   } catch (err) {
     res.status(500).json({ message: 'Error updating profile', error: err.message });
@@ -100,7 +113,7 @@ exports.loginUser = async (req, res) => {
 // Volunteer Dashboard
 exports.getVolunteerDashboard = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming you use middleware to get the logged-in user
+    const userId = req.user.userId; // Extract the user ID from token
     const user = await User.findById(userId);
 
     if (!user) {
