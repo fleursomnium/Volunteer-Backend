@@ -1,46 +1,37 @@
-import express from 'express';
-import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { fileURLToPath } = require('url');
 
-
-// Required to use __dirname with ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// Required to use __dirname with ES modules in Node.js
+//const __filename = fileURLToPath(__filename);
+//const __dirname = path.dirname(__filename);
 
 const app = express();
-
 
 // Enable CORS
 app.use(cors());
 
-
 // Enable JSON body parsing
 app.use(express.json());
-
 
 // Serve static files from the "public" directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-
-// Import the routes
-import volunteerHistoryRoutes from './src/routes/volunteerHistory.js'; // Gaby
-import LoginRoute from './src/routes/Login.js'; // Mel
-import VolunteerDashboardRoute from './src/routes/VolunteerDashboard.js'; // Mel
-import VolunteerMatchingRoute from './src/routes/volcards.js'; // Angie
-import NotificationsRoute from './src/routes/notifs.js'; // Angie
+// Import the routes using CommonJS (require)
+const volunteerHistoryRoutes = require('./src/routes/volunteerHistory.js'); // Gaby
+const LoginRoute = require('./src/routes/Login.js'); // Mel
+const VolunteerDashboardRoute = require('./src/routes/VolunteerDashboard.js'); // Mel
+const VolunteerMatchingRoute = require('./src/routes/volcards.js'); // Angie
+const NotificationsRoute = require('./src/routes/notifs.js'); // Angie
 // Syeda
 
 // Use the routes
 app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby
 app.use('/api/login', LoginRoute); // Mel
 app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel
-app.use('/api/notifs', NotificationsRoute); //Angie
+app.use('/api/notifs', NotificationsRoute); // Angie
 app.use('/api/volcards', VolunteerMatchingRoute); // Angie
-
-// Syeda
-// Angie
 
 // Placeholder routes for other pages
 app.get('/', (req, res) => res.json({ message: 'Welcome to the Home page!' }));
@@ -53,12 +44,13 @@ app.get('/api/eventmanagmentform', (req, res) => res.json({ message: 'Event Mana
 app.get('/api/volcards', (req, res) => res.json({ message: 'Volunteer Matching Form page route' }));
 app.get('/api/notifs', (req, res) => res.json({ message: 'Notifications page route' }));
 
-
 // Set up the server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
 
 
 
