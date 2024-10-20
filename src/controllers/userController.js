@@ -9,9 +9,31 @@ exports.registerUser = async (req, res) => {
   const { email, password, role } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 12);
-    const newUser = new User({ email, password: hashedPassword, role });
-    await newUser.save();
-    res.status(201).json({ message: 'User registered successfully' });
+
+    // Create a new user with the hashed password
+    const newUser = new User({ 
+      email, 
+      password: hashedPassword, 
+      role 
+    });
+
+    // Save the new user in the database
+    const savedUser = await newUser.save();
+
+    // Automatically create an empty profile
+    const emptyProfile = {
+      userId: savedUser._id,  // Use the registered user's ID
+      firstName: '',
+      lastName: '',
+      bio: '',
+      // Add other profile fields here as needed
+    };
+
+    // Save the empty profile (assuming you have a separate profile model or this is part of the user schema)
+    // For now, we'll assume the user schema has these fields as optional, and we're just updating them
+    await User.findByIdAndUpdate(savedUser._id, { profile: emptyProfile }, { new: true });
+
+    res.status(201).json({ message: 'User registered successfully', user: savedUser });
   } catch (err) {
     res.status(500).json({ message: 'Error registering user', error: err });
   }
