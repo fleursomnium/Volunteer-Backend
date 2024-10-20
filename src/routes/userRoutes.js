@@ -49,4 +49,3 @@ module.exports = router;
 // router.post("/", createUser);
 
 // export default router; // Use default export
-

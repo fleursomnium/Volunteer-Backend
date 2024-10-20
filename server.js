@@ -49,88 +49,59 @@ const eventRoutes = require('./src/routes/eventRoutes');
 
 
 dotenv.config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { fileURLToPath } = require('url');
+
+// Required to use __dirname with ES modules in Node.js
+//const __filename = fileURLToPath(__filename);
+//const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Middleware
+// Enable CORS
 app.use(cors());
+
+// Enable JSON body parsing
 app.use(express.json());
 
-console.log('MongoDB URI:', process.env.MONGO_URI); // Temporary logging for debugging
+// Serve static files from the "public" directory
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
-//MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected successfully'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+// Import the routes using CommonJS (require)
+const volunteerHistoryRoutes = require('./src/routes/volunteerHistory.js'); // Gaby
+const LoginRoute = require('./src/routes/Login.js'); // Mel
+const VolunteerDashboardRoute = require('./src/routes/VolunteerDashboard.js'); // Mel
+const VolunteerMatchingRoute = require('./src/routes/volcards.js'); // Angie
+const NotificationsRoute = require('./src/routes/notifs.js'); // Angie
+// Syeda
 
-// Routes
-app.use('/api/users', userRoutes);
-app.use('/api/events', eventRoutes);
-// app.use('/api/volunteer-history', volunteerHistoryRoutes);
+// Use the routes
+app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby
+app.use('/api/login', LoginRoute); // Mel
+app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel
+app.use('/api/notifs', NotificationsRoute); // Angie
+app.use('/api/volcards', VolunteerMatchingRoute); // Angie
 
+// Placeholder routes for other pages
+app.get('/', (req, res) => res.json({ message: 'Welcome to the Home page!' }));
+app.get('/api/register', (req, res) => res.json({ message: 'Register page route' }));
+app.get('/api/admin-dashboard', (req, res) => res.json({ message: 'Admin Dashboard page route' }));
+app.get('/api/volcards', (req, res) => res.json({ message: 'Volunteer Matching Form page route' }));
+app.get('/api/volunteermanagmentform', (req, res) => res.json({ message: 'Volunteer Management Form page route' }));
+app.get('/api/eventmanagmentform', (req, res) => res.json({ message: 'Event Management Form page route' }));
+// Angie
+app.get('/api/volcards', (req, res) => res.json({ message: 'Volunteer Matching Form page route' }));
+app.get('/api/notifs', (req, res) => res.json({ message: 'Notifications page route' }));
+
+// Set up the server
 const PORT = process.env.PORT || 4000;
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 
-module.exports = { app };
-
-
-
-// import express from 'express';
-// import cors from 'cors';
-// import path from 'path';
-// import { fileURLToPath } from 'url';
-
-
-// // Required to use __dirname with ES modules
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
-
-// const app = express();
-
-
-// // Enable CORS
-// app.use(cors());
-
-
-// // Enable JSON body parsing
-// app.use(express.json());
-
-
-// // Serve static files from the "public" directory
-// app.use('/public', express.static(path.join(__dirname, 'public')));
-
-
-// // Import the routes
-// import volunteerHistoryRoutes from './src/routes/volunteerHistory.js'; // Adjust for Gaby's routes
-// import LoginRoute from './src/routes/Login.js'; // Adjust for Mel's routes
-// import VolunteerDashboardRoute from './src/routes/VolunteerDashboard.js'; // Adjust for Mel's routes
-// import userRoutes from './src/routes/userRoutes.js'; // Correct relative path for Syeda's Volunteer Management Form
-// import eventRoutes from './src/routes/eventRoutes.js';
-
-// // Use the routes
-// app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby's Volunteer History Routes
-// app.use('/api/login', LoginRoute); // Mel's Login Route
-// app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel's Volunteer Dashboard Route
-// app.use('/api/users', userRoutes); // Syeda's Volunteer Management Form Route
-// app.use('/api/events', eventRoutes);
-
-// // Placeholder routes for other pages
-// app.get('/', (req, res) => res.json({ message: 'Welcome to the Home page!' }));
-// app.get('/api/register', (req, res) => res.json({ message: 'Register page route' }));
-// app.get('/api/admin-dashboard', (req, res) => res.json({ message: 'Admin Dashboard page route' }));
-// app.get('/api/volcards', (req, res) => res.json({ message: 'Volunteer Matching Form page route' }));
-// app.get('/api/volunteermanagmentform', (req, res) => res.json({ message: 'Volunteer Management Form page route' }));
-// app.get('/api/eventmanagmentform', (req, res) => res.json({ message: 'Event Management Form page route' }));
-// app.get('/api/notifs', (req, res) => res.json({ message: 'Notifications page route' }));
-
-
-// // Set up the server
-// const PORT = process.env.PORT || 4000;
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
 
 
 

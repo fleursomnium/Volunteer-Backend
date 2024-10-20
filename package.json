@@ -2,7 +2,7 @@
   "name": "volunteer-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "jest --coverage --testPathPattern=src/",
     "start": "node server.js",
@@ -20,6 +20,9 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.8",
+    "@babel/preset-env": "^7.25.8",
+    "babel-jest": "^29.7.0",
     "@babel/core": "^7.25.8",
     "@babel/preset-env": "^7.25.8",
     "babel-jest": "^29.7.0",
