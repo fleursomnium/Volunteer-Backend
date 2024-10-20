@@ -1,8 +1,11 @@
-//adminModel.js
 const mongoose = require('mongoose');
 
-// Admin email schema (for manually added admin emails)
+// Admin schema
 const adminSchema = new mongoose.Schema({
+  name: {   // Add this field
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     required: true,
