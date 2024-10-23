@@ -1,8 +1,12 @@
 //src\routes\voluneerRoutes.js
 const express = require('express');
-const { updateProfile } = require('../controllers/volunteerController');
+const { updateVolunteerProfile } = require('../controllers/volunteerController');
+const verifyToken = require('../middleware/authMiddleware'); // Import the middleware
+
 const router = express.Router();
 
-router.put('/profile/:userId', updateProfile);
+// Apply the middleware to protect the route
+router.put('/profile', verifyToken, updateVolunteerProfile);
 
 module.exports = router;
+

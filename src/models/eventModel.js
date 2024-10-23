@@ -1,45 +1,19 @@
-// const mongoose = require('mongoose'); 10/23/2024 1:24
-
-// const eventSchema = new mongoose.Schema({
-//   eventName: { type: String, required: true },
-//   eventDescription: { type: String, required: true },
-//   eventLocation: { type: String, required: true },
-//   eventTime: { type: String, required: true },
-//   skillsRequired: { type: [String], required: true },
-//   urgency: { type: String, required: true },
-//   registeredVolunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VolunteerProfile' }],
-// });
-
-// const Event = mongoose.model('Event', eventSchema);
-// module.exports = Event;
+//src\models\eventModel.js
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-  eventName: {
-    type: String,
-    required: true,
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  address: {  // Change location to address to store detailed address
+    address1: { type: String, required: true },
+    address2: { type: String },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    zipcode: { type: String, required: true }
   },
-  eventDescription: {
-    type: String,
-    required: true,
-  },
-  eventLocation: {
-    type: String,
-    required: true,
-  },
-  eventTime: {
-    type: String,
-    required: true,
-  },
-  requiredSkills: [String],
-  urgency: {
-    type: String,
-    default: 'Normal',
-  },
-  date: {
-    type: Date,
-    required: true,
-  },
+  date: { type: Date, required: true },
+  skillsRequired: { type: [String], required: true },
+  urgency: { type: String, required: true, enum: ['Low', 'Medium', 'High'] }
 });
 
 const Event = mongoose.model('Event', eventSchema);
