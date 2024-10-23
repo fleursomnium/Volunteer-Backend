@@ -6,7 +6,7 @@ const Notif = require('../models/notifsModel'); // Import the Notif model
 jest.mock('../models/notifsModel', () => ({
     find: jest.fn(),
     create: jest.fn(),
-  }));
+}));
 
 describe('Notification Controller', () => {
     // Test case for retrieving all notifications
@@ -44,4 +44,3 @@ describe('Notification Controller', () => {
         expect(response.body).toEqual(newNotif);  // Verify that the response matches the new notification
     });
 });
-

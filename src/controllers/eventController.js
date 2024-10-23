@@ -1,8 +1,10 @@
+
 const Event = require('../models/eventModel');
 
+// Controller to create a new event
 const createEvent = async (req, res) => {
     try {
-        console.log('Received event data:', req.body); // Debugging log
+        console.log('Received event data:', req.body);
 
         const {
             eventName,
@@ -22,7 +24,7 @@ const createEvent = async (req, res) => {
             return res.status(400).json({ message: 'Missing required fields or invalid data.' });
         }
 
-        // Create new event object
+        // Create a new event object
         const newEvent = new Event({
             eventName,
             description: eventDescription,
@@ -40,18 +42,222 @@ const createEvent = async (req, res) => {
 
         // Save the event in the database
         const savedEvent = await newEvent.save();
-        console.log('Event created successfully:', savedEvent); // Debugging log
+        console.log('Event created successfully:', savedEvent);
         res.status(201).json({ message: 'Event created successfully.', event: savedEvent });
     } catch (error) {
-        console.error('Error creating event:', error); // Debugging log
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: 'Validation Error', error: error.message });
-        }
+        console.error('Error creating event:', error);
         res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
 
-module.exports = { createEvent };
+// Controller to get all events
+const getEvents = async (req, res) => {
+    try {
+        const events = await Event.find(); // Fetch all events from the database
+        res.status(200).json(events); // Return events in JSON format
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+
+// Controller to get volunteers for a specific event
+const getVolunteersForEvent = async (req, res) => {
+    try {
+        const eventId = req.params.eventId;
+
+        // Fetch the event by ID and populate the volunteers if it's referenced in the event model
+        const event = await Event.findById(eventId).populate('volunteers'); // Assuming 'volunteers' is a field in your Event schema
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        res.status(200).json(event.volunteers); // Send volunteers as a response
+    } catch (error) {
+        console.error('Error fetching volunteers for event:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+module.exports = {
+    createEvent,
+    getEvents,
+    getVolunteersForEvent,
+};
+
+
+// const Event = require('../models/eventModel'); last one for testing
+
+// const createEvent = async (req, res) => {
+//     try {
+//         console.log('Received event data:', req.body); // Debugging log
+
+//         const {
+//             eventName,
+//             eventDescription,
+//             address1,
+//             address2,
+//             city,
+//             state,
+//             zipcode,
+//             urgency,
+//             skills,
+//             dates,
+//         } = req.body;
+
+//         // Validate required fields
+//         if (!eventName || !eventDescription || !address1 || !city || !state || !zipcode || !dates || dates.length === 0) {
+//             return res.status(400).json({ message: 'Missing required fields or invalid data.' });
+//         }
+
+//         // Create new event object
+//         const newEvent = new Event({
+//             eventName,
+//             description: eventDescription,
+//             location: {
+//                 address: address1,
+//                 address2: address2 || '', // Optional field
+//                 city,
+//                 state,
+//                 zipcode,
+//             },
+//             urgency: urgency || 'Normal', // Set default urgency if not provided
+//             requiredSkills: skills || [], // Default to empty array if not provided
+//             date: dates,
+//         });
+
+//         // Save the event in the database
+//         const savedEvent = await newEvent.save();
+//         console.log('Event created successfully:', savedEvent); // Debugging log
+//         res.status(201).json({ message: 'Event created successfully.', event: savedEvent });
+//     } catch (error) {
+//         console.error('Error creating event:', error); // Debugging log
+//         if (error.name === 'ValidationError') {
+//             return res.status(400).json({ message: 'Validation Error', error: error.message });
+//         }
+//         res.status(500).json({ message: 'Internal server error', error: error.message });
+//     }
+// };
+
+// module.exports = { createEvent };
+// const Event = require('../models/eventModel');
+
+// // Create a new event
+// const createEvent = async (req, res) => {
+//     try {
+//         console.log('Received event data:', req.body); // Debugging log
+
+//         const {
+//             eventName,
+//             eventDescription,
+//             address1,
+//             address2,
+//             city,
+//             state,
+//             zipcode,
+//             urgency,
+//             skills,
+//             dates,
+//         } = req.body;
+
+//         // Validate required fields
+//         if (!eventName || !eventDescription || !address1 || !city || !state || !zipcode || !dates || dates.length === 0) {
+//             return res.status(400).json({ message: 'Missing required fields or invalid data.' });
+//         }
+
+//         // Create new event object
+//         const newEvent = new Event({
+//             eventName,
+//             description: eventDescription,
+//             location: {
+//                 address: address1,
+//                 address2: address2 || '', // Optional field
+//                 city,
+//                 state,
+//                 zipcode,
+//             },
+//             urgency: urgency || 'Normal', // Set default urgency if not provided
+//             requiredSkills: skills || [], // Default to empty array if not provided
+//             date: dates,
+//         });
+
+//         // Save the event in the database
+//         const savedEvent = await newEvent.save();
+//         console.log('Event created successfully:', savedEvent); // Debugging log
+//         res.status(201).json({ message: 'Event created successfully.', event: savedEvent });
+//     } catch (error) {
+//         console.error('Error creating event:', error); // Debugging log
+//         if (error.name === 'ValidationError') {
+//             return res.status(400).json({ message: 'Validation Error', error: error.message });
+//         }
+//         res.status(500).json({ message: 'Internal server error', error: error.message });
+//     }
+// };
+
+// // Get all events
+// const getAllEvents = async (req, res) => {
+//     try {
+//         const events = await Event.find(); // Fetch all events
+//         res.status(200).json(events);
+//     } catch (error) {
+//         console.error('Error fetching events:', error); // Debugging log
+//         res.status(500).json({ message: 'Internal server error', error: error.message });
+//     }
+// };
+
+// // Get an event by ID
+// const getEventById = async (req, res) => {
+//     const { id } = req.params;
+//     try {
+//         const event = await Event.findById(id);
+//         if (!event) {
+//             return res.status(404).json({ message: 'Event not found' });
+//         }
+//         res.status(200).json(event);
+//     } catch (error) {
+//         console.error('Error fetching event:', error); // Debugging log
+//         res.status(500).json({ message: 'Internal server error', error: error.message });
+//     }
+// };
+
+// // Update an event
+// const updateEvent = async (req, res) => {
+//     const { id } = req.params;
+//     try {
+//         const updatedEvent = await Event.findByIdAndUpdate(id, req.body, { new: true });
+//         if (!updatedEvent) {
+//             return res.status(404).json({ message: 'Event not found' });
+//         }
+//         res.status(200).json(updatedEvent);
+//     } catch (error) {
+//         console.error('Error updating event:', error); // Debugging log
+//         res.status(500).json({ message: 'Internal server error', error: error.message });
+//     }
+// };
+
+// // Delete an event
+// const deleteEvent = async (req, res) => {
+//     const { id } = req.params;
+//     try {
+//         const deletedEvent = await Event.findByIdAndDelete(id);
+//         if (!deletedEvent) {
+//             return res.status(404).json({ message: 'Event not found' });
+//         }
+//         res.status(200).json({ message: 'Event deleted successfully' });
+//     } catch (error) {
+//         console.error('Error deleting event:', error); // Debugging log
+//         res.status(500).json({ message: 'Internal server error', error: error.message });
+//     }
+// };
+
+// module.exports = {
+//     createEvent,
+//     getAllEvents,
+//     getEventById,
+//     updateEvent,
+//     deleteEvent,
+// };latest 11:23
+
 
 // const Event = require('../models/eventModel');8:13
 

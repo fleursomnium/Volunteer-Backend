@@ -51,6 +51,9 @@
 //         });
 //     });
 // });
+// eventController.test.js
+
+
 const { createEvent } = require('../controllers/eventController');
 const Event = require('../models/eventModel');
 

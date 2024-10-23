@@ -49,8 +49,8 @@ const eventRoutes = require('./src/routes/eventRoutes');
 
 
 dotenv.config();
-const express = require('express');
-const cors = require('cors');
+// const express = require('express');
+// const cors = require('cors');
 const path = require('path');
 const { fileURLToPath } = require('url');
 
@@ -81,8 +81,12 @@ const NotificationsRoute = require('./src/routes/notifs.js'); // Angie
 app.use('/api/volunteer-history', volunteerHistoryRoutes); // Gaby
 app.use('/api/login', LoginRoute); // Mel
 app.use('/api/volunteer-dashboard', VolunteerDashboardRoute); // Mel
-app.use('/api/notifs', NotificationsRoute); // Angie
+app.use('/api/notifs', NotificationsRoute);
+
+// Set up the server// Angie
 app.use('/api/volcards', VolunteerMatchingRoute); // Angie
+app.use('/api/user', userRoutes); // syeda
+app.use('/api/event', eventRoutes); // syeda
 
 // Placeholder routes for other pages
 app.get('/', (req, res) => res.json({ message: 'Welcome to the Home page!' }));
@@ -92,10 +96,8 @@ app.get('/api/volcards', (req, res) => res.json({ message: 'Volunteer Matching F
 app.get('/api/volunteermanagmentform', (req, res) => res.json({ message: 'Volunteer Management Form page route' }));
 app.get('/api/eventmanagmentform', (req, res) => res.json({ message: 'Event Management Form page route' }));
 // Angie
-app.get('/api/volcards', (req, res) => res.json({ message: 'Volunteer Matching Form page route' }));
 app.get('/api/notifs', (req, res) => res.json({ message: 'Notifications page route' }));
 
-// Set up the server
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
