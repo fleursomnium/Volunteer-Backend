@@ -1,5 +1,6 @@
 
 const Event = require('../models/eventModel');
+const VolunteerProfile = require('../models/eventModel');
 
 // Controller to create a new event
 const createEvent = async (req, res) => {
