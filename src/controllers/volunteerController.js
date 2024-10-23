@@ -1,5 +1,6 @@
-const VolunteerProfile = require('src/models/volunteerProfileModel.js');
+const VolunteerProfile = require('../models/volunteerprofileModel')
 
+// Update Volunteer Profile
 const updateProfile = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -12,3 +13,4 @@ const updateProfile = async (req, res) => {
 };
 
 module.exports = { updateProfile };
+
