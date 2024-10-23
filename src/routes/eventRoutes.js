@@ -1,6 +1,6 @@
 //src\routes\eventRoutes.js
 const express = require('express');
-const { createEvent } = require('../controllers/eventController');
+const { createEvent, getEvents } = require('../controllers/eventController'); // Import getEvents
 const verifyToken = require('../middleware/authMiddleware');
 const verifyAdmin = require('../middleware/adminMiddleware');  // Add middleware to verify admin
 

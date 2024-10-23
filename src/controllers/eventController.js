@@ -91,4 +91,4 @@ const getEvents = async (req, res) => {
     }
   };
 
-module.exports = { createEvent, registerVolunteerToEvent };
+module.exports = { createEvent, registerVolunteerToEvent, getEvents };
