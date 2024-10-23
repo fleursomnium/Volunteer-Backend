@@ -1,5 +1,4 @@
 //src\controllers\authController.js
-// src\controllers\authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
@@ -33,7 +32,22 @@ const register = async (req, res) => {
 
     // If the user is a volunteer, create a blank volunteer profile
     if (role === 'volunteer') {
-      const volunteerProfile = new VolunteerProfile({ userId: user._id });
+      const volunteerProfile = new VolunteerProfile({
+        userId: user._id,
+        firstName: '',          // Blank fields for volunteer to update
+        lastName: '',
+        preferences: '',
+        skills: [],
+        address: {
+          address1: '',
+          address2: '',
+          city: '',
+          state: '',
+          zipcode: ''
+        },
+        availability: [],
+        confirmedEvents: []      // Empty by default, to be updated later
+      });
       await volunteerProfile.save();
     }
 
@@ -51,16 +65,25 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
+    // Find user by email
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ msg: 'Invalid credentials' });
+    if (!user) {
+      return res.status(404).json({ msg: 'Invalid credentials' });
+    }
 
+    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(404).json({ msg: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(404).json({ msg: 'Invalid credentials' });
+    }
 
+    // Generate JWT token
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Return token and role
     res.json({ token, role: user.role });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
