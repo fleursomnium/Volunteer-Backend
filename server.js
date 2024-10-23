@@ -14,12 +14,15 @@ app.use(express.json());
 // Import Routes
 const authRoutes = require('./src/routes/authRoutes');
 const eventRoutes = require('./src/routes/eventRoutes');
-const volunteerRoutes = require('./src/routes/volunteerRoutes')
+const volunteerRoutes = require('./src/routes/volunteerRoutes');
+const statesRoutes = require('./src/routes/statesRoutes');
 
 // Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/volunteers', volunteerRoutes);
+app.use('/api/states', statesRoutes);
+
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
