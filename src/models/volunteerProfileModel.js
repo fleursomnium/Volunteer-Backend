@@ -2,20 +2,20 @@ const mongoose = require('mongoose');
 
 const volunteerProfileSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  firstName: String,
-  lastName: String,
-  preferences: String,
-  skills: [String],
+  firstName: { type: String, default: '' },
+  lastName: { type: String, default: '' },
+  preferences: { type: String, default: '' },
+  skills: { type: [String], default: [] },
   address: {
-    address1: String,
-    address2: String,
-    city: String,
-    state: String,
-    zipcode: String,
+    address1: { type: String, default: '' },
+    address2: { type: String, default: '' },
+    city: { type: String, default: '' },
+    state: { type: String, default: '' },
+    zipcode: { type: String, default: '' }
   },
-  availability: [Date],
-  confirmedEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
+  availability: { type: [Date], default: [] },
+  confirmedEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }]
 });
 
-const VolunteerProfile = mongoose.model('VolunteerProfile', volunteerProfileSchema);
-module.exports = VolunteerProfile;
+// Check if the model has already been compiled, if so, use it; otherwise, compile it.
+module.exports = mongoose.models.VolunteerProfile || mongoose.model('VolunteerProfile', volunteerProfileSchema);

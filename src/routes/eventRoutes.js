@@ -1,8 +1,15 @@
+//src\routes\eventRoutes.js
 const express = require('express');
-const { createEvent, registerVolunteerToEvent } = require('../controllers/eventController');
+const { createEvent } = require('../controllers/eventController');
+const verifyToken = require('../middleware/authMiddleware');
+const verifyAdmin = require('../middleware/adminMiddleware');  // Add middleware to verify admin
+
 const router = express.Router();
 
-router.post('/create', createEvent);
-router.post('/register', registerVolunteerToEvent);
+// Route to fetch all events
+router.get('/', verifyToken, verifyAdmin, getEvents);
+
+// Route to create an event, protected for admins only
+router.post('/create', verifyToken, verifyAdmin, createEvent);
 
 module.exports = router;
