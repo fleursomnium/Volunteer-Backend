@@ -5,4 +5,4 @@ const router = express.Router();
 router.post('/create', createEvent);
 router.post('/register', registerVolunteerToEvent);
 
-// module.exports = router;
+module.exports = router;
