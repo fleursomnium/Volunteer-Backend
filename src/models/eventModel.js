@@ -13,7 +13,8 @@ const eventSchema = new mongoose.Schema({
   },
   date: { type: Date, required: true },
   skillsRequired: { type: [String], required: true },
-  urgency: { type: String, required: true, enum: ['Low', 'Medium', 'High'] }
+  urgency: { type: String, required: true, enum: ['Low', 'Medium', 'High'] },
+  registeredVolunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VolunteerProfile', default: [] }] // Add default: []
 });
 
 const Event = mongoose.model('Event', eventSchema);
