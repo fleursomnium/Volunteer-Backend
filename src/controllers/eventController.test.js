@@ -52,8 +52,6 @@
 //     });
 // });
 // eventController.test.js
-
-
 const { createEvent } = require('../controllers/eventController');
 const Event = require('../models/eventModel');
 
@@ -130,6 +128,85 @@ describe('EventController - createEvent', () => {
         });
     });
 });
+
+
+//10/25 11:35
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel');
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 eventName: 'Community Cleanup',
+//                 eventDescription: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 address2: '',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 urgency: 'High',
+//                 skills: ['Teamwork', 'Organization'],
+//                 dates: ['2024-10-21'],
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         // Mock successful event creation
+//         Event.prototype.save = jest.fn().mockResolvedValue({
+//             _id: '123',
+//             ...req.body,
+//         });
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Event created successfully.',
+//             event: {
+//                 _id: '123',
+//                 ...req.body,
+//             },
+//         });
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         // Remove required field to simulate missing data
+//         req.body.eventName = '';
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Missing required fields or invalid data.',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Mock server error
+//         Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Internal server error',
+//             error: 'Database error',
+//         });
+//     });
+// });
 
 // const { createEvent } = require('../controllers/eventController');give 9 out of 10
 // const Event = require('../models/eventModel');
