@@ -5,51 +5,50 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new events
+// eventController.js
 const createEvent = async (req, res) => {
-    try {
-      console.log("Request body:", req.body);  // Log the request body to ensure data is coming through
-      const { name, description, address1, address2, city, state, zipcode, skillsRequired, urgency, date, time } = req.body;
-  
-      // Basic validation to ensure all required fields are present
-      if (!name || !description || !address1 || !city || !state || !zipcode || !skillsRequired || !urgency || !date || !time) {
-        console.log("Missing required fields");
-        return res.status(400).json({ msg: 'Please fill all required fields' });
-      }
-  
-      // Ensure that the `date` is a valid date object
-      if (isNaN(new Date(date).getTime())) {
-        console.log("Invalid date format:", date);
-        return res.status(400).json({ msg: 'Invalid date format' });
-      }
-  
-      const event = new Event({
-        name,
-        description,
-        address: {  // Pass the address object here
-          address1,
-          address2,
-          city,
-          state,
-          zipcode
-        },
-        skillsRequired,
-        urgency,
-        date: new Date(date),  // Save the date as a Date object
-        time
-      });
-  
-      await event.save();
-      console.log("Event saved successfully");
-      return res.status(201).json({ msg: 'Event created successfully', eventId: event._id });
-    } catch (error) {
-      console.error("Error while creating event:", error);
-      return res.status(500).json({ msg: 'Failed to create event' });
+  try {
+    console.log("Request body:", req.body);
+    const { name, description, address1, address2, city, state, zipcode, skillsRequired, urgency, date, timeStart, timeEnd } = req.body;
+
+    // Basic validation
+    if (!name || !description || !address1 || !city || !state || !zipcode || !skillsRequired || !urgency || !date || !timeStart || !timeEnd) {
+      console.log("Missing required fields");
+      return res.status(400).json({ msg: 'Please fill all required fields' });
     }
 
+    // Ensure date is valid
+    if (isNaN(new Date(date).getTime())) {
+      console.log("Invalid date format:", date);
+      return res.status(400).json({ msg: 'Invalid date format' });
+    }
 
+    const event = new Event({
+      name,
+      description,
+      address: {
+        address1,
+        address2,
+        city,
+        state,
+        zipcode
+      },
+      skillsRequired,
+      urgency,
+      date: new Date(date),
+      timeStart,
+      timeEnd
+    });
 
+    await event.save();
+    console.log("Event saved successfully");
+    return res.status(201).json({ msg: 'Event created successfully', eventId: event._id });
+  } catch (error) {
+    console.error("Error while creating event:", error);
+    return res.status(500).json({ msg: 'Failed to create event' });
+  }
+};
 
-  };  
   
   
   const registerVolunteerToEvent = async (req, res) => {
