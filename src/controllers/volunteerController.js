@@ -1,8 +1,22 @@
 const VolunteerProfile = require('../models/volunteerprofileModel');
 
+const getVolunteerProfile = async (req, res) => {
+  const { userId } = req.user;
+  try {
+    const profile = await VolunteerProfile.findOne({ userId });
+    if (!profile) {
+      return res.status(404).json({ msg: 'Profile not found' });
+    }
+    res.status(200).json(profile);
+  } catch (error) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
 // Update volunteer profile
 const updateVolunteerProfile = async (req, res) => {
   const { userId } = req.user;  // Now req.user is populated by the middleware
+  console.log("Request body:", req.body);  // Log incoming data for debugging
   const { firstName, lastName, preferences, skills, address1, address2, city, state, zipcode, availability } = req.body;
 
   try {
@@ -33,4 +47,4 @@ const updateVolunteerProfile = async (req, res) => {
 };
 
 
-module.exports = { updateVolunteerProfile };
+module.exports = { updateVolunteerProfile, getVolunteerProfile };
