@@ -9,4 +9,3 @@ const router = express.Router();
 router.put('/profile', verifyToken, updateVolunteerProfile);
 
 module.exports = router;
-
