@@ -1,6 +1,6 @@
 //src\controllers\eventController.js
 const Event = require('../models/eventModel');
-const VolunteerProfile = require('../models/volunteerprofileModel');
+const VolunteerProfile = require('../models/volunteerProfileModel');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -49,6 +49,44 @@ const createEvent = async (req, res) => {
   }
 };
 
+// Update an existing event
+const updateEvent = async (req, res) => {
+  const eventId = req.params.id; // Get the event ID from the URL parameters
+  const { name, description, address1, address2, city, state, zipcode, skillsRequired, urgency, date, timeStart, timeEnd } = req.body;
+
+  try {
+    // Find and update the event
+    const updatedEvent = await Event.findByIdAndUpdate(
+      eventId,
+      {
+        name,
+        description,
+        address: {
+          address1,
+          address2,
+          city,
+          state,
+          zipcode,
+        },
+        skillsRequired,
+        urgency,
+        date: new Date(date), // Ensure the date is stored as a Date object
+        timeStart,
+        timeEnd,
+      },
+      { new: true, runValidators: true } // Return the updated document
+    );
+
+    if (!updatedEvent) {
+      return res.status(404).json({ msg: 'Event not found' });
+    }
+
+    res.status(200).json({ msg: 'Event updated successfully', event: updatedEvent });
+  } catch (error) {
+    console.error("Error updating event:", error);
+    res.status(500).json({ msg: 'Failed to update event' });
+  }
+};
   
   
   const registerVolunteerToEvent = async (req, res) => {
@@ -180,5 +218,5 @@ const unregisterVolunteerFromEvent = async (req, res) => {
   
   
 
-module.exports = { createEvent, registerVolunteerToEvent, getEvents, getAvailableEvents, 
+module.exports = { createEvent, updateEvent, registerVolunteerToEvent, getEvents, getAvailableEvents, 
                    getScheduledEvents, unregisterVolunteerFromEvent };

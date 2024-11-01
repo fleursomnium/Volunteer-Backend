@@ -1,6 +1,6 @@
 //src\routes\eventRoutes.js
 const express = require('express');
-const { createEvent, getEvents, getAvailableEvents, getScheduledEvents, 
+const { createEvent, updateEvent, getEvents, getAvailableEvents, getScheduledEvents, 
     registerVolunteerToEvent, unregisterVolunteerFromEvent } = require('../controllers/eventController'); // Import getEvents
 const verifyToken = require('../middleware/authMiddleware');
 const verifyAdmin = require('../middleware/adminMiddleware');  // Add middleware to verify admin
@@ -12,6 +12,9 @@ router.get('/', verifyToken, verifyAdmin, getEvents);
 
 // Route to create an event, protected for admins only
 router.post('/create', verifyToken, verifyAdmin, createEvent);
+
+// Route to update an existing event by its ID
+router.put('/:id', verifyToken, verifyAdmin, updateEvent);
 
 // Route to get all available events (those not registered by the volunteer)
 router.get('/available', verifyToken, getAvailableEvents);
