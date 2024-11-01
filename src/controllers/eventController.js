@@ -1,11 +1,11 @@
 //src\controllers\eventController.js
 const Event = require('../models/eventModel');
 const VolunteerProfile = require('../models/volunteerProfileModel');
+const Notification = require('../models/notificationModel');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new events
-// eventController.js
 const createEvent = async (req, res) => {
   try {
     console.log("Request body:", req.body);
@@ -42,6 +42,20 @@ const createEvent = async (req, res) => {
 
     await event.save();
     console.log("Event saved successfully");
+
+
+    // Create a notification for all volunteers
+    const notification = new Notification({
+      title: `New Event: ${event.name}`,
+      message: `A new event "${event.name}" has been created. Check it out and sign up if you're interested!`,
+      targetAudience: 'volunteer', // Specify that this notification is for volunteers
+      eventId: event._id // Link to the event
+    });
+    await notification.save();
+
+
+
+
     return res.status(201).json({ msg: 'Event created successfully', eventId: event._id });
   } catch (error) {
     console.error("Error while creating event:", error);
@@ -98,7 +112,7 @@ const updateEvent = async (req, res) => {
     try {
         // Convert eventId to ObjectId
         const event = await Event.findById(new ObjectId(eventId));  // Make sure to use new ObjectId()
-        
+       
         if (!event) {
             return res.status(404).json({ msg: 'Event not found' });
         }
@@ -138,9 +152,9 @@ const updateEvent = async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 };
+ 
+   
 
-  
-    
 
 const getEvents = async (req, res) => {
     try {
@@ -196,27 +210,64 @@ const getScheduledEvents = async (req, res) => {
   // Unregister a volunteer from an event
 const unregisterVolunteerFromEvent = async (req, res) => {
     const { eventId } = req.body;
-  
+ 
     try {
       // Find the volunteer by their userId from the token
       const volunteer = await VolunteerProfile.findOne({ userId: req.user.userId });
       if (!volunteer) return res.status(404).json({ msg: 'Volunteer not found' });
-  
+ 
       // Remove the event from the volunteer's confirmedEvents
       volunteer.confirmedEvents = volunteer.confirmedEvents.filter(
         (id) => id.toString() !== eventId
       );
-      
+     
       await volunteer.save();
-  
+ 
       res.status(200).json({ msg: 'Volunteer unregistered from event successfully' });
     } catch (error) {
       console.error(error);
       res.status(500).json({ msg: 'Error unregistering from event' });
     }
   };
-  
-  
+
+
+  async function getMatchingEvents(req, res) {
+    try {
+        const volunteerId = req.user.userId;
+
+
+        const volunteer = await VolunteerProfile.findById(volunteerId);
+        if (!volunteer) {
+            return res.status(404).json({ message: "Volunteer not found" });
+        }
+
+
+        const { skills, availability, address, confirmedEvents } = volunteer;
+
+
+        const filter = {
+            _id: { $nin: confirmedEvents },
+            skillsRequired: { $in: skills },
+            date: { $in: availability },
+            "address.city": address.city,
+            "address.state": address.state,
+        };
+
+
+        const matchingEvents = await Event.find(filter).populate(
+            "registeredVolunteers"
+        );
+
+
+        res.json(matchingEvents);
+    } catch (error) {
+        console.error("Error fetching matching events:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+ 
+ 
+
 
 module.exports = { createEvent, updateEvent, registerVolunteerToEvent, getEvents, getAvailableEvents, 
                    getScheduledEvents, unregisterVolunteerFromEvent };
