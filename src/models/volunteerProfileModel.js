@@ -14,7 +14,8 @@ const volunteerProfileSchema = new mongoose.Schema({
     zipcode: { type: String, default: '' }
   },
   availability: { type: [Date], default: [] },
-  confirmedEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }]
+  confirmedEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
+  history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] // Ensure this line correctly references the Event model
 });
 
 // Check if the model has already been compiled, if so, use it; otherwise, compile it.
