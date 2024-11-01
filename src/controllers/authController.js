@@ -46,13 +46,15 @@ const register = async (req, res) => {
           zipcode: ''
         },
         availability: [],
-        confirmedEvents: []      // Empty by default, to be updated later
+        confirmedEvents: [],      // Empty by default, to be updated later
+        volunteerFormCompleted: 'not completed'
       });
       await volunteerProfile.save();
     }
 
     // Generate JWT token for authentication
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log("Generated token:", token);
     
     // Send response with token and user role
     res.status(201).json({ token, role });
@@ -79,6 +81,7 @@ const login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log("Generated token:", token);
 
     // Return token and role
     res.json({ token, role: user.role });
@@ -87,4 +90,22 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const getUser = async (req, res) => {
+  try {
+    // Ensure `req.user` exists
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ msg: 'Unauthorized. No user data found.' });
+    }
+
+    const user = await User.findById(req.user.userId); // Use `userId` from the verified token
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    res.status(200).json({ role: user.role });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+module.exports = { register, login, getUser };
