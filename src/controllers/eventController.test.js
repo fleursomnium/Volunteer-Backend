@@ -1,3 +1,1145 @@
+
+// const mongoose = require('mongoose');
+// const request = require('supertest');
+// const express = require('express');
+// const {
+//     createEvent,
+//     registerVolunteerToEvent,
+//     getEvents,
+//     getAvailableEvents,
+//     getScheduledEvents,
+//     unregisterVolunteerFromEvent
+// } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+// const VolunteerProfile = require('../models/volunteerProfileModel');
+// const Notification = require('../models/notificationModel');
+
+// const app = express();
+// app.use(express.json());
+// app.post('/api/events', createEvent);
+// app.post('/api/events/register', registerVolunteerToEvent);
+// app.get('/api/events', getEvents);
+// app.get('/api/events/available', getAvailableEvents);
+// app.get('/api/events/scheduled', getScheduledEvents);
+// app.post('/api/events/unregister', unregisterVolunteerFromEvent);
+
+// jest.mock('../models/eventModel');
+// jest.mock('../models/volunteerProfileModel');
+// jest.mock('../models/notificationModel');
+
+// describe('Event Controller', () => {
+//     afterEach(() => {
+//         jest.clearAllMocks();
+//     });
+
+//     afterAll(async () => {
+//         await new Promise(resolve => setTimeout(resolve, 500)); // Ensure async operations finish
+//     });
+
+//     describe('createEvent', () => {
+//         it('should create a new event and return status 201', async () => {
+//             const mockEvent = {
+//                 name: 'Community Cleanup',
+//                 description: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 skillsRequired: ['Teamwork'],
+//                 urgency: 'High',
+//                 date: '2024-10-21',
+//                 timeStart: '10:00 AM',
+//                 timeEnd: '2:00 PM'
+//             };
+//             Event.create.mockResolvedValue({ _id: 'event123', ...mockEvent });
+
+//             const response = await request(app).post('/api/events').send(mockEvent);
+
+//             expect(response.status).toBe(201);
+//             expect(response.body).toEqual({ msg: 'Event created successfully', eventId: 'event123' });
+//         });
+
+//         it('should return status 400 if required fields are missing', async () => {
+//             Event.create.mockImplementation(() => {
+//                 throw { status: 400, message: 'Please fill all required fields' };
+//             });
+
+//             const response = await request(app).post('/api/events').send({ name: 'Community Cleanup' });
+
+//             expect(response.status).toBe(400);
+//             expect(response.body).toEqual({ msg: 'Please fill all required fields' });
+//         });
+//     });
+
+//     describe('registerVolunteerToEvent', () => {
+//         it('should register a volunteer to an event and return status 200', async () => {
+//             const reqBody = { eventId: 'event123', volunteerId: 'volunteer123' };
+//             Event.findById.mockResolvedValue({ registeredVolunteers: [], save: jest.fn() });
+//             VolunteerProfile.findOne.mockResolvedValue({ confirmedEvents: [], save: jest.fn() });
+
+//             const response = await request(app).post('/api/events/register').send(reqBody);
+
+//             expect(response.status).toBe(200);
+//             expect(response.body).toEqual({ msg: 'Volunteer registered for event' });
+//         });
+
+//         it('should return status 404 if event not found', async () => {
+//             Event.findById.mockResolvedValue(null);
+
+//             const response = await request(app).post('/api/events/register').send({ eventId: 'invalidEvent', volunteerId: 'volunteer123' });
+
+//             expect(response.status).toBe(404);
+//             expect(response.body).toEqual({ msg: 'Event not found' });
+//         });
+//     });
+
+//     describe('getEvents', () => {
+//         it('should return all events with status 200', async () => {
+//             const mockEvents = [{ name: 'Event1' }, { name: 'Event2' }];
+//             Event.find.mockResolvedValue(mockEvents);
+
+//             const response = await request(app).get('/api/events');
+
+//             expect(response.status).toBe(200);
+//             expect(response.body).toEqual(mockEvents);
+//         });
+//     });
+
+//     describe('getAvailableEvents', () => {
+//         it('should return available events for a volunteer', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue({ confirmedEvents: [{ _id: 'event1' }] });
+//             Event.find.mockResolvedValue([{ _id: 'event2', name: 'Available Event' }]);
+
+//             const response = await request(app).get('/api/events/available');
+
+//             expect(response.status).toBe(200);
+//             expect(response.body).toEqual([{ _id: 'event2', name: 'Available Event' }]);
+//         });
+
+//         it('should return status 404 if volunteer not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             const response = await request(app).get('/api/events/available');
+
+//             expect(response.status).toBe(404);
+//             expect(response.body).toEqual({ msg: 'Volunteer not found' });
+//         });
+//     });
+
+//     describe('getScheduledEvents', () => {
+//         it('should return scheduled events for a volunteer', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue({
+//                 confirmedEvents: [{ _id: 'event123', name: 'Scheduled Event' }]
+//             });
+
+//             const response = await request(app).get('/api/events/scheduled');
+
+//             expect(response.status).toBe(200);
+//             expect(response.body).toEqual([{ _id: 'event123', name: 'Scheduled Event' }]);
+//         });
+//     });
+
+//     describe('unregisterVolunteerFromEvent', () => {
+//         it('should unregister a volunteer from an event and return status 200', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue({
+//                 confirmedEvents: [{ toString: () => 'event123' }],
+//                 save: jest.fn()
+//             });
+
+//             const response = await request(app).post('/api/events/unregister').send({ eventId: 'event123', volunteerId: 'volunteer123' });
+
+//             expect(response.status).toBe(200);
+//             expect(response.body).toEqual({ msg: 'Volunteer unregistered from event successfully' });
+//         });
+
+//         it('should handle error if volunteer not registered for event', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue({
+//                 confirmedEvents: [{ toString: () => 'event124' }],
+//                 save: jest.fn()
+//             });
+
+//             const response = await request(app).post('/api/events/unregister').send({ eventId: 'event123', volunteerId: 'volunteer123' });
+
+//             expect(response.status).toBe(400);
+//             expect(response.body).toEqual({ msg: 'Volunteer not registered for this event' });
+//         });
+//     });
+// });
+
+
+
+
+
+
+
+
+const mongoose = require('mongoose');
+const {
+    createEvent,
+    registerVolunteerToEvent,
+    getEvents,
+    getAvailableEvents,
+    getScheduledEvents,
+    unregisterVolunteerFromEvent
+} = require('./eventController');
+const Event = require('../models/eventModel');
+const VolunteerProfile = require('../models/volunteerProfileModel');
+const Notification = require('../models/notificationModel');
+
+jest.mock('../models/eventModel');
+jest.mock('../models/volunteerProfileModel');
+jest.mock('../models/notificationModel');
+
+describe('Event Controller', () => {
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('createEvent', () => {
+        it('should create a new event and return status 201', async () => {
+            const req = {
+                body: {
+                    name: 'Community Cleanup',
+                    description: 'A cleanup event for the local park',
+                    address1: '456 Park Lane',
+                    address2: '',
+                    city: 'Houston',
+                    state: 'TX',
+                    zipcode: '77002',
+                    skillsRequired: ['Teamwork'],
+                    urgency: 'High',
+                    date: '2024-10-21',
+                    timeStart: '10:00 AM',
+                    timeEnd: '2:00 PM',
+                }
+            };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            Event.prototype.save = jest.fn().mockResolvedValue({ _id: 'event123' });
+            Notification.prototype.save = jest.fn().mockResolvedValue({});
+
+            await createEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Event created successfully', eventId: 'event123' });
+        });
+
+        it('should return status 400 if required fields are missing', async () => {
+            const req = { body: { name: 'Community Cleanup' } }; // Missing required fields
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            await createEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Please fill all required fields' });
+        });
+
+        it('should return status 400 for invalid date format', async () => {
+            const req = {
+                body: {
+                    name: 'Community Cleanup',
+                    description: 'A cleanup event for the local park',
+                    date: 'invalid-date' // Invalid date format
+                }
+            };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            await createEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Invalid date format' });
+        });
+    });
+
+    describe('registerVolunteerToEvent', () => {
+        it('should register a volunteer to an event and return status 200', async () => {
+            const req = { body: { eventId: '607f1f77bcf86cd799439011', volunteerId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            Event.findById = jest.fn().mockResolvedValue({ registeredVolunteers: [], save: jest.fn() });
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue({ confirmedEvents: [], save: jest.fn() });
+
+            await registerVolunteerToEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer registered for event' });
+        });
+
+        it('should return status 404 if event not found', async () => {
+            const req = { body: { eventId: '607f1f77bcf86cd799439011', volunteerId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            Event.findById = jest.fn().mockResolvedValue(null);
+
+            await registerVolunteerToEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Event not found' });
+        });
+
+        it('should return status 404 if volunteer not found', async () => {
+            const req = { body: { eventId: '607f1f77bcf86cd799439011', volunteerId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            Event.findById = jest.fn().mockResolvedValue({});
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue(null);
+
+            await registerVolunteerToEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer not found' });
+        });
+    });
+
+    describe('getEvents', () => {
+        it('should return all events with status 200', async () => {
+            const req = {};
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            Event.find = jest.fn().mockResolvedValue([{ name: 'Event1' }, { name: 'Event2' }]);
+
+            await getEvents(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith([{ name: 'Event1' }, { name: 'Event2' }]);
+        });
+    });
+
+    describe('getAvailableEvents', () => {
+        it('should return available events for a volunteer', async () => {
+            const req = { user: { userId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue({ confirmedEvents: [{ _id: '507f1f77bcf86cd799439012' }] });
+            Event.find = jest.fn().mockResolvedValue([{ _id: '507f1f77bcf86cd799439013' }]);
+
+            await getAvailableEvents(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith([{ _id: '507f1f77bcf86cd799439013' }]);
+        });
+
+        it('should return status 404 if volunteer not found', async () => {
+            const req = { user: { userId: 'nonexistent' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue(null);
+
+            await getAvailableEvents(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer not found' });
+        });
+    });
+
+    describe('getScheduledEvents', () => {
+        it('should return scheduled events for a volunteer', async () => {
+            const req = { user: { userId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue({ confirmedEvents: [{ _id: '507f1f77bcf86cd799439012' }] });
+
+            await getScheduledEvents(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith([{ _id: '507f1f77bcf86cd799439012' }]);
+        });
+    });
+
+    describe('unregisterVolunteerFromEvent', () => {
+        it('should unregister a volunteer from an event and return status 200', async () => {
+            const req = { body: { eventId: '507f1f77bcf86cd799439012' }, user: { userId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue({
+                confirmedEvents: [{ toString: () => '507f1f77bcf86cd799439012' }],
+                save: jest.fn(),
+            });
+
+            await unregisterVolunteerFromEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer unregistered from event successfully' });
+        });
+
+        it('should return status 404 if volunteer is not found', async () => {
+            const req = { body: { eventId: '507f1f77bcf86cd799439012' }, user: { userId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue(null);
+
+            await unregisterVolunteerFromEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer not found' });
+        });
+
+        it('should handle error if volunteer not registered for event', async () => {
+            const req = { body: { eventId: '507f1f77bcf86cd799439012' }, user: { userId: '507f1f77bcf86cd799439011' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            
+            VolunteerProfile.findOne = jest.fn().mockResolvedValue({
+                confirmedEvents: [{ toString: () => '507f1f77bcf86cd799439013' }],
+                save: jest.fn(),
+            });
+
+            await unregisterVolunteerFromEvent(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(400); // Adjust based on your actual logic
+            expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer not registered for this event' }); // Adjust based on your actual logic
+        });
+    });
+});
+
+
+
+
+
+
+
+
+
+//new 
+// const mongoose = require('mongoose');
+// const { createEvent, registerVolunteerToEvent, getEvents, getAvailableEvents, getScheduledEvents, unregisterVolunteerFromEvent } = require('./eventController');
+// const Event = require('../models/eventModel');
+// const VolunteerProfile = require('../models/volunteerProfileModel');
+// const Notification = require('../models/notificationModel');
+
+// jest.mock('../models/eventModel');
+// jest.mock('../models/volunteerProfileModel');
+// jest.mock('../models/notificationModel');
+
+// describe('Event Controller', () => {
+//     afterEach(() => {
+//         jest.clearAllMocks();
+//     });
+
+//     describe('createEvent', () => {
+//         it('should create a new event and return status 201', async () => {
+//             const req = {
+//                 body: {
+//                     name: 'Community Cleanup',
+//                     description: 'A cleanup event for the local park',
+//                     address1: '456 Park Lane',
+//                     address2: '',
+//                     city: 'Houston',
+//                     state: 'TX',
+//                     zipcode: '77002',
+//                     skillsRequired: ['Teamwork'],
+//                     urgency: 'High',
+//                     date: '2024-10-21',
+//                     timeStart: '10:00 AM',
+//                     timeEnd: '2:00 PM',
+//                 }
+//             };
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             Event.prototype.save = jest.fn().mockResolvedValue({});
+//             Notification.prototype.save = jest.fn().mockResolvedValue({});
+
+//             await createEvent(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(201);
+//             expect(res.json).toHaveBeenCalledWith({ msg: 'Event created successfully', eventId: expect.anything() });
+//         });
+
+//         it('should return status 400 if required fields are missing', async () => {
+//             const req = { body: { name: 'Community Cleanup' } }; // Missing required fields
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             await createEvent(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(400);
+//             expect(res.json).toHaveBeenCalledWith({ msg: 'Please fill all required fields' });
+//         });
+//     });
+
+//     describe('registerVolunteerToEvent', () => {
+//         it('should register a volunteer to an event and return status 200', async () => {
+//             const req = { body: { eventId: '607f1f77bcf86cd799439011', volunteerId: '507f1f77bcf86cd799439011' } };
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             Event.findById = jest.fn().mockResolvedValue({ registeredVolunteers: [], save: jest.fn() });
+//             VolunteerProfile.findOne = jest.fn().mockResolvedValue({ confirmedEvents: [], save: jest.fn() });
+
+//             await registerVolunteerToEvent(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(200);
+//             expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer registered for event' });
+//         });
+
+//         it('should return status 404 if event or volunteer is not found', async () => {
+//             const req = { body: { eventId: '607f1f77bcf86cd799439011', volunteerId: '507f1f77bcf86cd799439011' } };
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             Event.findById = jest.fn().mockResolvedValue(null);
+
+//             await registerVolunteerToEvent(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(404);
+//             expect(res.json).toHaveBeenCalledWith({ msg: 'Event not found' });
+//         });
+//     });
+
+//     describe('getEvents', () => {
+//         it('should return all events with status 200', async () => {
+//             const req = {};
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             Event.find = jest.fn().mockResolvedValue([{ name: 'Event1' }, { name: 'Event2' }]);
+
+//             await getEvents(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(200);
+//             expect(res.json).toHaveBeenCalledWith([{ name: 'Event1' }, { name: 'Event2' }]);
+//         });
+//     });
+
+//     describe('getAvailableEvents', () => {
+//         it('should return available events for a volunteer', async () => {
+//             const req = { user: { userId: '507f1f77bcf86cd799439011' } };
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             VolunteerProfile.findOne = jest.fn().mockResolvedValue({ confirmedEvents: [{ _id: '507f1f77bcf86cd799439012' }] });
+//             Event.find = jest.fn().mockResolvedValue([{ _id: '507f1f77bcf86cd799439013' }]);
+
+//             await getAvailableEvents(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(200);
+//             expect(res.json).toHaveBeenCalledWith([{ _id: '507f1f77bcf86cd799439013' }]);
+//         });
+//     });
+
+//     describe('getScheduledEvents', () => {
+//         it('should return scheduled events for a volunteer', async () => {
+//             const req = { user: { userId: '507f1f77bcf86cd799439011' } };
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             VolunteerProfile.findOne = jest.fn().mockResolvedValue({ confirmedEvents: [{ _id: '507f1f77bcf86cd799439012' }] });
+
+//             await getScheduledEvents(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(200);
+//             expect(res.json).toHaveBeenCalledWith([{ _id: '507f1f77bcf86cd799439012' }]);
+//         });
+//     });
+
+//     describe('unregisterVolunteerFromEvent', () => {
+//         it('should unregister a volunteer from an event and return status 200', async () => {
+//             const req = { body: { eventId: '507f1f77bcf86cd799439012' }, user: { userId: '507f1f77bcf86cd799439011' } };
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             VolunteerProfile.findOne = jest.fn().mockResolvedValue({
+//                 confirmedEvents: [{ toString: () => '507f1f77bcf86cd799439012' }],
+//                 save: jest.fn(),
+//             });
+
+//             await unregisterVolunteerFromEvent(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(200);
+//             expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer unregistered from event successfully' });
+//         });
+
+//         it('should return status 404 if volunteer is not found', async () => {
+//             const req = { body: { eventId: '507f1f77bcf86cd799439012' }, user: { userId: '507f1f77bcf86cd799439011' } };
+//             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+//             VolunteerProfile.findOne = jest.fn().mockResolvedValue(null);
+
+//             await unregisterVolunteerFromEvent(req, res);
+
+//             expect(res.status).toHaveBeenCalledWith(404);
+//             expect(res.json).toHaveBeenCalledWith({ msg: 'Volunteer not found' });
+//         });
+//     });
+// });
+
+
+
+
+
+
+
+
+
+//11/01
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel'); // Mock the Event model
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 name: 'Community Cleanup',
+//                 description: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 address2: '',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 skillsRequired: ['Teamwork'],
+//                 urgency: 'High',
+//                 date: '2024-10-21',
+//                 time: '10:00 AM',
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         // Mock save method of the Event model to return an event with _id
+//         Event.prototype.save = jest.fn().mockResolvedValue({ _id: '123' });
+
+//         await createEvent(req, res);
+
+//         // Expect status to be 201 and json response with the mocked eventId
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully',
+//             eventId: '123',
+//         });
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body = {}; // Empty request body to simulate missing fields
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({ msg: 'Please fill all required fields' });
+//     });
+
+//     it('should return 500 if event creation fails', async () => {
+//         // Mock save to simulate a database error
+//         Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({ msg: 'Failed to create event' });
+//     });
+// });
+
+
+
+
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel');
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 name: 'Community Cleanup',
+//                 description: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 address2: '',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 skillsRequired: ['Teamwork'],
+//                 urgency: 'High',
+//                 date: '2024-10-21',
+//                 time: '10:00 AM',
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         // Mock Event.save to return an object with _id '123'
+//         Event.mockImplementation(() => ({
+//             save: jest.fn().mockResolvedValue({ _id: '123' }),
+//         }));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully',
+//             eventId: '123',
+//         });
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body = {}; // Empty request body to simulate missing fields
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({ msg: 'Please fill all required fields' });
+//     });
+
+//     it('should return 500 if event creation fails', async () => {
+//         Event.mockImplementation(() => ({
+//             save: jest.fn().mockRejectedValue(new Error('Database error')),
+//         }));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({ msg: 'Failed to create event' });
+//     });
+// });
+
+
+
+
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel');
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 name: 'Community Cleanup',
+//                 description: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 skillsRequired: ['Teamwork'],
+//                 urgency: 'High',
+//                 date: '2024-10-21',
+//                 time: '10:00 AM',
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         Event.mockImplementation(() => ({
+//             save: jest.fn().mockResolvedValue({ _id: '123' }),
+//         }));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully',
+//             eventId: '123',
+//         });
+//     });
+
+//     it('should return 500 if event creation fails', async () => {
+//         Event.mockImplementation(() => ({
+//             save: jest.fn().mockRejectedValue(new Error('Database error')),
+//         }));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({ msg: 'Failed to create event' });
+//     });
+// });
+
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel'); // Mock the Event model
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 name: 'Community Cleanup',
+//                 description: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 skillsRequired: ['Teamwork'],
+//                 urgency: 'High',
+//                 date: '2024-10-21',
+//                 time: '10:00 AM',
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         Event.prototype.save = jest.fn().mockResolvedValue({ _id: '123', ...req.body });
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully',
+//             eventId: '123',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({ msg: 'Failed to create event' });
+//     });
+// });
+
+// 10/31//
+//eventController.test.js
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel'); // Mock the Event model
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 name: 'Community Cleanup',
+//                 description: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 skillsRequired: ['Teamwork'],
+//                 urgency: 'High',
+//                 date: '2024-10-21',
+//                 time: '10:00 AM',
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         // Mock successful event creation
+//         Event.prototype.save = jest.fn().mockResolvedValue({
+//             _id: '123',
+//             ...req.body,
+//         });
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully',
+//             eventId: '123',
+//         });
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         // Remove required field to simulate missing data
+//         req.body.name = '';
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Please fill all required fields',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Mock server error
+//         Event.prototype.save = jest.fn().mockImplementation(() => {
+//             return Promise.resolve({ _id: '123', ...req.body });
+//         });
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Failed to create event',
+//         });
+//     });
+// });
+
+// // Suppress console logs
+// beforeAll(() => {
+//     jest.spyOn(console, 'log').mockImplementation(() => { });
+// });
+
+// afterAll(() => {
+//     console.log.mockRestore();
+// });
+
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel');
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 name: 'Community Cleanup',
+//                 description: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 skillsRequired: ['Teamwork'],
+//                 urgency: 'High',
+//                 date: '2024-10-21',
+//                 time: '10:00 AM',
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         Event.prototype.save = jest.fn().mockResolvedValue({
+//             _id: '123',
+//             ...req.body,
+//         });
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully',
+//             eventId: '123',
+//         });
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         req.body.name = ''; // Remove a required field
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Please fill all required fields',
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Failed to create event',
+//         });
+//     });
+// });
+
+//10/31
+// 10/31// eventController.test.js
+// // eventController.test.js
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel'); // Mock the Event model
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 eventName: 'Community Cleanup',
+//                 eventDescription: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 address2: '',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 urgency: 'High',
+//                 skills: ['Teamwork', 'Organization'],
+//                 dates: ['2024-10-21'],
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         // Mock successful event creation
+//         Event.prototype.save = jest.fn().mockResolvedValue({
+//             _id: '123',
+//             ...req.body,
+//         });
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully.',
+//             event: {
+//                 _id: '123',
+//                 ...req.body,
+//             },
+//         });
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         // Remove required field to simulate missing data
+//         req.body.eventName = '';
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Please fill all required fields', // Match your controller’s actual message
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Mock server error
+//         Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Internal server error',
+//             error: 'Database error',
+//         });
+//     });
+// });
+// beforeAll(() => {
+//     jest.spyOn(console, 'log').mockImplementation(() => { });
+// });
+
+// afterAll(() => {
+//     console.log.mockRestore();
+// });
+
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
+
+// jest.mock('../models/eventModel'); // Mock the Event model
+
+// describe('EventController - createEvent', () => {
+//     let req, res;
+
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 eventName: 'Community Cleanup',
+//                 eventDescription: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 address2: '',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 urgency: 'High',
+//                 skills: ['Teamwork', 'Organization'],
+//                 dates: ['2024-10-21'],
+//             },
+//         };
+
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     it('should create an event successfully', async () => {
+//         // Mock successful event creation
+//         Event.prototype.save = jest.fn().mockResolvedValue({
+//             _id: '123',
+//             ...req.body,
+//         });
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Event created successfully.', // Match with your controller response
+//             event: {
+//                 _id: '123',
+//                 ...req.body,
+//             },
+//         });
+//     });
+
+//     it('should return 400 if required fields are missing', async () => {
+//         // Remove required field to simulate missing data
+//         req.body.eventName = '';
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Please fill all required fields', // Adjust to match your controller’s response
+//         });
+//     });
+
+//     it('should return 500 if there is a server error', async () => {
+//         // Mock server error
+//         Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
+
+//         await createEvent(req, res);
+
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             msg: 'Internal server error', // Match with your controller response
+//             error: 'Database error',
+//         });
+//     });
+// });
+//10/31
+
 // const { createEvent } = require('../controllers/eventController');
 // const Event = require('../models/eventModel');
 
@@ -52,82 +1194,82 @@
 //     });
 // });
 // eventController.test.js
-const { createEvent } = require('../controllers/eventController');
-const Event = require('../models/eventModel');
+// const { createEvent } = require('../controllers/eventController');
+// const Event = require('../models/eventModel');
 
-jest.mock('../models/eventModel');
+// jest.mock('../models/eventModel');
 
-describe('EventController - createEvent', () => {
-    let req, res;
+// describe('EventController - createEvent', () => {
+//     let req, res;
 
-    beforeEach(() => {
-        req = {
-            body: {
-                eventName: 'Community Cleanup',
-                eventDescription: 'A cleanup event for the local park',
-                address1: '456 Park Lane',
-                address2: '',
-                city: 'Houston',
-                state: 'TX',
-                zipcode: '77002',
-                urgency: 'High',
-                skills: ['Teamwork', 'Organization'],
-                dates: ['2024-10-21'],
-            },
-        };
+//     beforeEach(() => {
+//         req = {
+//             body: {
+//                 eventName: 'Community Cleanup',
+//                 eventDescription: 'A cleanup event for the local park',
+//                 address1: '456 Park Lane',
+//                 address2: '',
+//                 city: 'Houston',
+//                 state: 'TX',
+//                 zipcode: '77002',
+//                 urgency: 'High',
+//                 skills: ['Teamwork', 'Organization'],
+//                 dates: ['2024-10-21'],
+//             },
+//         };
 
-        res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn(),
-        };
+//         res = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
 
-        jest.clearAllMocks();
-    });
+//         jest.clearAllMocks();
+//     });
 
-    it('should create an event successfully', async () => {
-        // Mock successful event creation
-        Event.prototype.save = jest.fn().mockResolvedValue({
-            _id: '123',
-            ...req.body,
-        });
+//     it('should create an event successfully', async () => {
+//         // Mock successful event creation
+//         Event.prototype.save = jest.fn().mockResolvedValue({
+//             _id: '123',
+//             ...req.body,
+//         });
 
-        await createEvent(req, res);
+//         await createEvent(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.json).toHaveBeenCalledWith({
-            message: 'Event created successfully.',
-            event: {
-                _id: '123',
-                ...req.body,
-            },
-        });
-    });
+//         expect(res.status).toHaveBeenCalledWith(201);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Event created successfully.',
+//             event: {
+//                 _id: '123',
+//                 ...req.body,
+//             },
+//         });
+//     });
 
-    it('should return 400 if required fields are missing', async () => {
-        // Remove required field to simulate missing data
-        req.body.eventName = '';
+//     it('should return 400 if required fields are missing', async () => {
+//         // Remove required field to simulate missing data
+//         req.body.eventName = '';
 
-        await createEvent(req, res);
+//         await createEvent(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.json).toHaveBeenCalledWith({
-            message: 'Missing required fields or invalid data.',
-        });
-    });
+//         expect(res.status).toHaveBeenCalledWith(400);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Missing required fields or invalid data.',
+//         });
+//     });
 
-    it('should return 500 if there is a server error', async () => {
-        // Mock server error
-        Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
+//     it('should return 500 if there is a server error', async () => {
+//         // Mock server error
+//         Event.prototype.save = jest.fn().mockRejectedValue(new Error('Database error'));
 
-        await createEvent(req, res);
+//         await createEvent(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({
-            message: 'Internal server error',
-            error: 'Database error',
-        });
-    });
-});
+//         expect(res.status).toHaveBeenCalledWith(500);
+//         expect(res.json).toHaveBeenCalledWith({
+//             message: 'Internal server error',
+//             error: 'Database error',
+//         });
+//     });
+// });
 
 
 //10/25 11:35
