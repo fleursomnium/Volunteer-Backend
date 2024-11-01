@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 require('dotenv').config();
-const cron = require('node-cron');
+const cron = require('node-cron'); 
 
 dotenv.config();
 
@@ -30,6 +30,7 @@ app.use('/api/volunteers', volunteerRoutes);
 app.use('/api/states', statesRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
@@ -37,33 +38,33 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 // Schedule a cron job to run every day at midnight to update volunteer histories
-// cron.schedule('0 0 * * *', async () => {
-//   try {
-//     const now = new Date();
-//     const pastEvents = await Event.find({ date: { $lt: now } }); // Find events with a past date
+cron.schedule('0 0 * * *', async () => {
+  try {
+    const now = new Date();
+    const pastEvents = await Event.find({ date: { $lt: now } }); // Find events with a past date
 
-//     for (const event of pastEvents) {
-//       // For each past event, update all registered volunteers' histories
-//       await VolunteerProfile.updateMany(
-//         { confirmedEvents: event._id },
-//         {
-//           //$pull: { confirmedEvents: event._id }, // Remove from confirmed events
-//           $addToSet: { history: event._id } // Add to history without duplicating
-//         }
-//       );
-//     }
-//     //console.log('Volunteer histories updated');
-//   } catch (error) {
-//     console.error('Error updating volunteer histories:', error);
-//   }
-// });
+    for (const event of pastEvents) {
+      // For each past event, update all registered volunteers' histories
+      await VolunteerProfile.updateMany(
+        { confirmedEvents: event._id },
+        {
+          //$pull: { confirmedEvents: event._id }, // Remove from confirmed events
+          $addToSet: { history: event._id } // Add to history without duplicating
+        }
+      );
+    }
+    //console.log('Volunteer histories updated');
+  } catch (error) {
+    console.error('Error updating volunteer histories:', error);
+  }
+});
 
 
 // Start Server
 const PORT = process.env.PORT || 4000;
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 module.exports = app;
 
 // //10//31 //server.js

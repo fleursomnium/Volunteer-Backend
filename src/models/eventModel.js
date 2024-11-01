@@ -16,6 +16,8 @@ const eventSchema = new mongoose.Schema({
     zipcode: { type: String, required: true }
   },
   date: { type: Date, required: true },
+  timeStart: { type: String, required: true },
+  timeEnd: { type: String, required: true },
   skillsRequired: { type: [String], required: true },
   urgency: { type: String, required: true, enum: ['Low', 'Medium', 'High'] },
   registeredVolunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VolunteerProfile', default: [] }] // Add default: []
