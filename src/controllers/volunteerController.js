@@ -1,4 +1,4 @@
-const VolunteerProfile = require('../models/volunteerprofileModel');
+const VolunteerProfile = require('../models/volunteerProfileModel');
 const User = require('../models/userModel');
 
 // Get volunteer profile with role included
@@ -67,5 +67,29 @@ const updateVolunteerProfile = async (req, res) => {
   }
 };
 
+// Function to get the volunteer's history
+const getVolunteerHistory = async (req, res) => {
+  try {
+    // Make sure to use only the userId from req.user
+    const userId = req.user.userId;
+    console.log("Fetching volunteer history for userId:", userId);
 
-module.exports = { updateVolunteerProfile, getVolunteerProfile };
+    const volunteerProfile = await VolunteerProfile.findOne({ userId })
+      .populate('history', 'name description date address skillsRequired'); // Populate with event details
+
+    if (!volunteerProfile) {
+      console.log("Volunteer profile not found");
+      return res.status(404).json({ msg: 'Volunteer profile not found' });
+    }
+
+    console.log("Volunteer history fetched successfully:", volunteerProfile.history);
+    res.status(200).json(volunteerProfile.history);
+  } catch (error) {
+    console.error('Error fetching volunteer history:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+
+
+module.exports = { updateVolunteerProfile, getVolunteerProfile, getVolunteerHistory };

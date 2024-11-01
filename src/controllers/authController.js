@@ -2,7 +2,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const VolunteerProfile = require('../models/volunteerprofileModel');
+const VolunteerProfile = require('../models/volunteerProfileModel');
 const mongoose = require('mongoose');
 
 // Use MongoDB native query for admin emails collection

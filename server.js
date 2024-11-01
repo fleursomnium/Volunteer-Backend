@@ -4,9 +4,13 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 require('dotenv').config();
-
+const cron = require('node-cron'); 
 
 dotenv.config();
+
+// Models
+const Event = require('./src/models/eventModel');
+const VolunteerProfile = require('./src/models/volunteerProfileModel');
 
 const app = express();
 app.use(cors());
@@ -28,6 +32,29 @@ app.use('/api/states', statesRoutes);
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
+
+
+// Schedule a cron job to run every day at midnight to update volunteer histories
+cron.schedule('0 0 * * *', async () => {
+  try {
+    const now = new Date();
+    const pastEvents = await Event.find({ date: { $lt: now } }); // Find events with a past date
+
+    for (const event of pastEvents) {
+      // For each past event, update all registered volunteers' histories
+      await VolunteerProfile.updateMany(
+        { confirmedEvents: event._id },
+        {
+          //$pull: { confirmedEvents: event._id }, // Remove from confirmed events
+          $addToSet: { history: event._id } // Add to history without duplicating
+        }
+      );
+    }
+    //console.log('Volunteer histories updated');
+  } catch (error) {
+    console.error('Error updating volunteer histories:', error);
+  }
+});
 
 
 // Start Server
