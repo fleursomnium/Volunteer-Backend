@@ -45,6 +45,14 @@ const createEvent = async (req, res) => {
 
 
     // Create a notification for all volunteers
+    const notification = new Notification({
+      title: `New Event: ${event.name}`,
+      message: `A new event "${event.name}" has been created. Check it out and sign up if you're interested!`,
+      targetAudience: 'volunteer', // Specify that this notification is for volunteers
+      eventId: event._id // Link to the event
+    });
+    await notification.save();
+
 
 
 
