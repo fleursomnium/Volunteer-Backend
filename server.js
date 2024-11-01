@@ -37,7 +37,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 // Schedule a cron job to run every day at midnight to update volunteer histories
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
   try {
     const now = new Date();
     const pastEvents = await Event.find({ date: { $lt: now } }); // Find events with a past date
