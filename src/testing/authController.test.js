@@ -380,7 +380,7 @@
 // });
 
 // authController.test.js
-const authController = require('./authController');
+const authController = require('../controllers/authController');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');

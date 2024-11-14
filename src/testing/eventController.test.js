@@ -181,7 +181,7 @@ const {
     getAvailableEvents,
     getScheduledEvents,
     unregisterVolunteerFromEvent
-} = require('./eventController');
+} = require('../controllers/eventController');
 const Event = require('../models/eventModel');
 const VolunteerProfile = require('../models/volunteerProfileModel');
 const Notification = require('../models/notificationModel');
