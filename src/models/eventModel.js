@@ -1,7 +1,3 @@
-// // //src\models\eventModel.js
-//src\models\eventModel.js
-//src\models\eventModel.
-
 //src\models\eventModel.js
 const mongoose = require('mongoose');
 

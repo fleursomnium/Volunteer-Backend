@@ -1,6 +1,7 @@
 const express = require('express');
 const { createEvent, updateEvent, getEvents, getAvailableEvents, getScheduledEvents, 
-    registerVolunteerToEvent, unregisterVolunteerFromEvent } = require('../controllers/eventController'); // Import getEvents
+    registerVolunteerToEvent, unregisterVolunteerFromEvent, runMatches, 
+    getUpcomingEvents, getPastEvents} = require('../controllers/eventController'); // Import getEvents
 const verifyToken = require('../middleware/authMiddleware');
 const verifyAdmin = require('../middleware/adminMiddleware');  // Add middleware to verify admin
 
@@ -28,7 +29,15 @@ router.post('/register', verifyToken, registerVolunteerToEvent);
 // Route to unregister a volunteer from an event
 router.post('/unregister', verifyToken, unregisterVolunteerFromEvent);
 
+router.post('/run-matches', verifyToken, runMatches);
+
+router.get('/upcoming', verifyToken, getUpcomingEvents);
+
+router.get('/past', verifyToken, getPastEvents);
+
 module.exports = router;
+
+
 // 10/29/2024//
 //const express = require('express');
 // const { createEvent, getEvents, getAvailableEvents, getScheduledEvents,
