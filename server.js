@@ -21,6 +21,7 @@ const eventRoutes = require('./src/routes/eventRoutes');
 const volunteerRoutes = require('./src/routes/volunteerRoutes');
 const statesRoutes = require('./src/routes/statesRoutes');
 const notificationRoutes = require('./src/routes/notificationRoutes');
+const reportRoutes = require('./src/routes/reportRoutes'); 
 
 
 // Use Routes
@@ -29,6 +30,7 @@ app.use('/api/events', eventRoutes);
 app.use('/api/volunteers', volunteerRoutes);
 app.use('/api/states', statesRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/reports', reportRoutes);
 
 
 // MongoDB Connection
