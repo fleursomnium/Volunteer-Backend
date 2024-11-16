@@ -1,5 +1,3 @@
-
-
 //src\controllers\eventController.js
 const Event = require('../models/eventModel');
 const VolunteerProfile = require('../models/volunteerProfileModel');

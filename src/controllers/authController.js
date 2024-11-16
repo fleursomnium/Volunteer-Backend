@@ -54,7 +54,7 @@ const register = async (req, res) => {
 
     // Generate JWT token for authentication
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log("Generated token:", token);
+    //console.log("Generated token:", token);
     
     // Send response with token and user role
     res.status(201).json({ token, role });
@@ -81,7 +81,7 @@ const login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log("Generated token:", token);
+    //console.log("Generated token:", token);
 
     // Return token and role
     res.json({ token, role: user.role });

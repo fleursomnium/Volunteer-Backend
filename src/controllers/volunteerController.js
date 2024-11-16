@@ -1,5 +1,13 @@
+//src\controllers\volunteerController.js
 const VolunteerProfile = require('../models/volunteerProfileModel');
 const User = require('../models/userModel');
+
+const { checkTimeOverlap } = require('../utils/dateUtils');
+
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+const mongoose = require('mongoose'); // Add this line at the top
+
+
 
 // Get volunteer profile with role included
 const getVolunteerProfile = async (req, res) => {
@@ -90,6 +98,257 @@ const getVolunteerHistory = async (req, res) => {
   }
 };
 
+// Update general availability
+const updateGeneralAvailability = async (req, res) => {
+  const { userId } = req.user;
+  const { generalAvailability } = req.body;
+
+  try {
+    const profile = await VolunteerProfile.findOne({ userId });
+    if (!profile) return res.status(404).json({ msg: 'Profile not found' });
+
+    // Validate general availability input
+    for (const [day, times] of Object.entries(generalAvailability)) {
+      if ((!times.start && times.end) || (times.start && !times.end)) {
+          return res.status(400).json({ msg: `Incomplete time range for ${day}.` });
+      }
+      if (times.start && times.end && times.start >= times.end) {
+          return res.status(400).json({ msg: `Invalid time range for ${day}. Start must be before End.` });
+      }
+  }
+  
+
+    profile.availability.general = generalAvailability;
+    await profile.save();
+
+    res.status(200).json({ msg: 'General availability updated successfully', profile });
+  } catch (error) {
+    console.error('Error updating general availability:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
 
 
-module.exports = { updateVolunteerProfile, getVolunteerProfile, getVolunteerHistory };
+// Update specific availability with validation
+const updateSpecificAvailability = async (req, res) => {
+  const { userId } = req.user;
+  const { specificDates } = req.body;
+
+  try {
+    const profile = await VolunteerProfile.findOne({ userId });
+    if (!profile) return res.status(404).json({ msg: 'Profile not found' });
+
+    // Validate overlaps
+    for (const specificDate of specificDates) {
+      for (const blockedDate of profile.availability.overrides.remove) {
+        if (checkTimeOverlap(specificDate, blockedDate)) {
+          return res.status(400).json({
+            msg: `Overlap detected between specific date ${specificDate.date} and blocked date ${blockedDate.date}.`,
+          });
+        }
+      }
+    }
+
+    // Add specific availability dates
+    const formattedDates = specificDates.map((entry) => ({
+      date: new Date(entry.date),
+      start: entry.start,
+      end: entry.end,
+    }));
+
+    profile.availability.specific = [
+      ...profile.availability.specific,
+      ...formattedDates.filter(
+          (newEntry) =>
+              !profile.availability.specific.some(
+                  (existing) => existing.date.getTime() === newEntry.date.getTime()
+              )
+      ),
+  ];
+
+    await profile.save();
+    res.status(200).json({ msg: 'Specific availability updated successfully', profile });
+  } catch (error) {
+    console.error('Error updating specific availability:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Update blocked dates with validation
+const updateBlockedDates = async (req, res) => {
+  const { userId } = req.user;
+  const { blockedDates } = req.body;
+
+  try {
+    const profile = await VolunteerProfile.findOne({ userId });
+    if (!profile) return res.status(404).json({ msg: 'Profile not found' });
+
+    // Validate overlaps
+    for (const blockedDate of blockedDates) {
+      for (const specificDate of profile.availability.overrides.add) {
+        if (checkTimeOverlap(specificDate, blockedDate)) {
+          return res.status(400).json({
+            msg: `Overlap detected between blocked date ${blockedDate.date} and specific date ${specificDate.date}.`,
+          });
+        }
+      }
+    }
+
+    // Add blocked dates
+    const formattedBlockedDates = blockedDates.map((entry) => ({
+      date: new Date(entry.date),
+      start: entry.start,
+      end: entry.end,
+    }));
+
+    profile.availability.blocked = [
+      ...profile.availability.blocked,
+      ...formattedBlockedDates.filter(
+          (newEntry) =>
+              !profile.availability.blocked.some(
+                  (existing) => existing.date.getTime() === newEntry.date.getTime()
+              )
+      ),
+  ];
+
+    await profile.save();
+    res.status(200).json({ msg: 'Blocked dates updated successfully', profile });
+  } catch (error) {
+    console.error('Error updating blocked dates:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Update availability (Combined function)
+const updateAvailability = async (req, res) => {
+  const { userId } = req.user;
+  const {
+    generalAvailability,
+    specificDates,
+    blockedDates,
+    specificDatesToDelete,
+    blockedDatesToDelete,
+  } = req.body;
+
+  try {
+    const profile = await VolunteerProfile.findOne({ userId });
+    if (!profile) return res.status(404).json({ msg: 'Profile not found' });
+
+    // Initialize availability if undefined
+    if (!profile.availability) {
+      profile.availability = { general: {}, specific: [], blocked: [] };
+    }
+
+    // Update general availability
+    if (generalAvailability) {
+      console.log('Updating general availability');
+      profile.availability.general = generalAvailability;
+    }
+
+    // Handle deletions for specific dates
+    if (specificDatesToDelete && specificDatesToDelete.length > 0) {
+      profile.availability.specific = profile.availability.specific.filter(
+        (entry) => !specificDatesToDelete.includes(entry._id.toString())
+      );
+    }
+
+    // Update specific dates
+    if (specificDates) {
+      specificDates.forEach((newEntry) => {
+        const newDate = new Date(newEntry.date);
+        if (newEntry._id && isValidObjectId(newEntry._id)) {
+          // Existing entry - update it
+          const index = profile.availability.specific.findIndex(
+            (existingEntry) => existingEntry._id.toString() === newEntry._id
+          );
+          if (index >= 0) {
+            profile.availability.specific[index] = {
+              ...profile.availability.specific[index].toObject(),
+              ...newEntry,
+              date: newDate,
+            };
+          } else {
+            console.warn('Specific date entry not found for update:', newEntry._id);
+          }
+        } else {
+          // New entry - add it
+          profile.availability.specific.push({
+            date: newDate,
+            start: newEntry.start || '',
+            end: newEntry.end || '',
+          });
+        }
+      });
+    }
+
+    // Handle deletions for blocked dates
+    if (blockedDatesToDelete && blockedDatesToDelete.length > 0) {
+      profile.availability.blocked = profile.availability.blocked.filter(
+        (entry) => !blockedDatesToDelete.includes(entry._id.toString())
+      );
+    }
+
+    // Update blocked dates
+    if (blockedDates) {
+      blockedDates.forEach((newEntry) => {
+        const newDate = new Date(newEntry.date);
+        if (isValidObjectId(newEntry._id)) {
+          // Existing entry - update it
+          const index = profile.availability.blocked.findIndex(
+            (existingEntry) => existingEntry._id.toString() === newEntry._id
+          );
+          if (index >= 0) {
+            profile.availability.blocked[index] = {
+              ...profile.availability.blocked[index]._doc,
+              ...newEntry,
+              date: newDate,
+            };
+          }
+        } else {
+          // New entry - add it
+          profile.availability.blocked.push({
+            ...newEntry,
+            date: newDate,
+          });
+        }
+      });
+    }
+
+    // Optional: Validate for conflicts or overlaps here
+
+    // Save the profile with updated availability
+    await profile.save();
+
+    res.status(200).json({
+      msg: 'Availability updated successfully',
+      availability: profile.availability,
+    });
+  } catch (error) {
+    console.error('Error updating availability:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Fetch the availability of the volunteer
+const getAvailability = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const profile = await VolunteerProfile.findOne({ userId });
+    if (!profile) {
+      return res.status(404).json({ msg: 'Profile not found' });
+    }
+
+    res.status(200).json({
+      availability: profile.availability,
+    });
+  } catch (error) {
+    console.error('Error fetching availability:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+
+module.exports = { updateVolunteerProfile, getVolunteerProfile, getVolunteerHistory, 
+  updateBlockedDates, updateGeneralAvailability, updateSpecificAvailability, 
+  updateAvailability, getAvailability };
