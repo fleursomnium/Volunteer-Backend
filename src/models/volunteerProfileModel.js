@@ -38,6 +38,7 @@ const volunteerProfileSchema = new mongoose.Schema({
         date: Date,
         start: String,
         end: String,
+        isAllDay: Boolean,
       },
     ],
     blocked: [
@@ -45,6 +46,7 @@ const volunteerProfileSchema = new mongoose.Schema({
         date: Date,
         start: String,
         end: String,
+        isAllDay: Boolean,
       },
     ],
   }, 
