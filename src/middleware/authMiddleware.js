@@ -26,7 +26,7 @@ const verifyToken = (req, res, next) => {
 
     // Attach the decoded token payload to req.user
     req.user = decoded;
-    console.log("Decoded Token:", decoded);  // For debugging, you can remove this later
+    //console.log("Decoded Token:", decoded);  // For debugging, you can remove this later
 
     next();
   });

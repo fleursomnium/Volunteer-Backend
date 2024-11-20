@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -20,15 +21,18 @@ const authRoutes = require('./src/routes/authRoutes');
 const eventRoutes = require('./src/routes/eventRoutes');
 const volunteerRoutes = require('./src/routes/volunteerRoutes');
 const statesRoutes = require('./src/routes/statesRoutes');
+const skillsRoutes = require('./src/routes/skillRoutes');
 const notificationRoutes = require('./src/routes/notificationRoutes');
-
+const reportRoutes = require('./src/routes/reportRoutes'); 
 
 // Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/volunteers', volunteerRoutes);
 app.use('/api/states', statesRoutes);
+app.use('/api/skills', skillsRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/reports', reportRoutes);
 
 
 // MongoDB Connection

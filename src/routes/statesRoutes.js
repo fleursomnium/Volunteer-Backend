@@ -1,7 +1,8 @@
+// src/routes/statesRoutes.js
 const express = require('express');
-const { getAllStates } = require('../controllers/statesController'); // Ensure these are correctly imported
+const { getAllStates } = require('../controllers/statesController');
 const router = express.Router();
 
-router.get('/', getAllStates); // GET route for fetching all events
+router.get('/', getAllStates); // Define the route for fetching all states
 
 module.exports = router;

@@ -54,7 +54,7 @@ const register = async (req, res) => {
 
     // Generate JWT token for authentication
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log("Generated token:", token);
+    //console.log("Generated token:", token);
     
     // Send response with token and user role
     res.status(201).json({ token, role });
@@ -70,18 +70,18 @@ const login = async (req, res) => {
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ msg: 'Invalid credentials' });
+      return res.status(404).json({ msg: 'This email is not in use' });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(404).json({ msg: 'Invalid credentials' });
+      return res.status(404).json({ msg: 'Incorrect password' });
     }
 
     // Generate JWT token
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log("Generated token:", token);
+    //console.log("Generated token:", token);
 
     // Return token and role
     res.json({ token, role: user.role });

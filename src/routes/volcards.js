@@ -1,16 +1,17 @@
 const express = require('express');
-const { getVolunteers, addVolunteer, updateVolunteer, deleteVolunteer } = require('../controllers/volunteerController');
+const { getVolunteerProfile, addVolunteer, updateVolunteerProfile, deleteVolunteer } = require('../controllers/volunteerController');
+const verifyToken = require('../middleware/authMiddleware'); // Import the middleware
 
 const router = express.Router();
 
 // Route to get all volunteers
-router.get('/', getVolunteers);
+router.get('/profile', verifyToken, getVolunteerProfile);
 
 // Route to add a new volunteer
 router.post('/', addVolunteer);
 
 // Route to update a volunteer by ID
-router.put('/:id', updateVolunteer);
+router.put('/:id', updateVolunteerProfile);
 
 // Route to delete a volunteer by ID
 router.delete('/:id', deleteVolunteer);

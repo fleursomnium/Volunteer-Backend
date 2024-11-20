@@ -1,5 +1,3 @@
-
-
 //src\controllers\eventController.js
 const Event = require('../models/eventModel');
 const VolunteerProfile = require('../models/volunteerProfileModel');
@@ -7,11 +5,30 @@ const Notification = require('../models/notificationModel');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
+const hasTimeConflict = (event1, event2) => {
+  // Check if the events are on the same date
+  const event1Date = new Date(event1.date).toDateString();
+  const event2Date = new Date(event2.date).toDateString();
+
+  if (event1Date !== event2Date) {
+    return false; // Events are on different dates, no conflict
+  }
+
+  // Parse event times
+  const event1Start = new Date(`${event1.date.toISOString().split('T')[0]}T${event1.timeStart}`);
+  const event1End = new Date(`${event1.date.toISOString().split('T')[0]}T${event1.timeEnd}`);
+  const event2Start = new Date(`${event2.date.toISOString().split('T')[0]}T${event2.timeStart}`);
+  const event2End = new Date(`${event2.date.toISOString().split('T')[0]}T${event2.timeEnd}`);
+
+  // Check for overlap
+  return event1Start < event2End && event1End > event2Start;
+};
+
 // Create a new events
 const createEvent = async (req, res) => {
   try {
     console.log("Request body:", req.body);
-    const { name, description, address1, address2, city, state, zipcode, skillsRequired, urgency, date, timeStart, timeEnd } = req.body;
+    const { name, description, address1, address2, city, state, zipcode, skillsRequired, urgency, date, timeStart, timeEnd, addressMode } = req.body;
 
     // Basic validation
     if (!name || !description || !address1 || !city || !state || !zipcode || !skillsRequired || !urgency || !date || !timeStart || !timeEnd) {
@@ -39,7 +56,8 @@ const createEvent = async (req, res) => {
       urgency,
       date: new Date(date),
       timeStart,
-      timeEnd
+      timeEnd,
+      addressMode
     });
 
     await event.save();
@@ -68,7 +86,7 @@ const createEvent = async (req, res) => {
 // Update an existing event
 const updateEvent = async (req, res) => {
   const eventId = req.params.id; // Get the event ID from the URL parameters
-  const { name, description, address1, address2, city, state, zipcode, skillsRequired, urgency, date, timeStart, timeEnd } = req.body;
+  const { name, description, address1, address2, city, state, zipcode, skillsRequired, urgency, date, timeStart, timeEnd, addressMode } = req.body;
 
   try {
     // Find and update the event
@@ -89,6 +107,7 @@ const updateEvent = async (req, res) => {
         date: new Date(date), // Ensure the date is stored as a Date object
         timeStart,
         timeEnd,
+        addressMode
       },
       { new: true, runValidators: true } // Return the updated document
     );
@@ -159,14 +178,49 @@ const updateEvent = async (req, res) => {
 
 
 const getEvents = async (req, res) => {
-    try {
-        const events = await Event.find(); // Fetch all events from the database
-        res.status(200).json(events);
-    } catch (err) {
-        res.status(500).json({ msg: 'Failed to fetch events' });
-    }
+  try {
+    const events = await Event.find().populate('registeredVolunteers');
+    const eventsWithCounts = events.map((event) => ({
+      ...event.toObject(),
+      volunteerCount: event.registeredVolunteers.length,
+    }));
+    res.status(200).json(eventsWithCounts);
+  } catch (err) {
+    res.status(500).json({ msg: 'Failed to fetch events' });
+  }
 };
 
+// src/controllers/eventController.js
+
+const getUpcomingEvents = async (req, res) => {
+  try {
+    const today = new Date();
+    const events = await Event.find({ date: { $gte: today } }).populate('registeredVolunteers');
+    // Include volunteer counts if needed
+    const eventsWithCounts = events.map((event) => ({
+      ...event.toObject(),
+      volunteerCount: event.registeredVolunteers.length,
+    }));
+    res.status(200).json(eventsWithCounts);
+  } catch (err) {
+    res.status(500).json({ msg: 'Failed to fetch upcoming events' });
+  }
+};
+
+const getPastEvents = async (req, res) => {
+  try {
+    const today = new Date();
+    const events = await Event.find({ date: { $lt: today } }).populate('registeredVolunteers');
+    // Include volunteer counts if needed
+    const eventsWithCounts = events.map((event) => ({
+      ...event.toObject(),
+      volunteerCount: event.registeredVolunteers.length,
+    }));
+    res.status(200).json(eventsWithCounts);
+  } catch (err) {
+    res.status(500).json({ msg: 'Failed to fetch past events' });
+  }
+};
 
 
 // Fetch available events for the volunteer (those they are not yet registered for)
@@ -268,8 +322,134 @@ const unregisterVolunteerFromEvent = async (req, res) => {
     }
 }
  
- 
+const runMatches = async (req, res) => {
+  try {
+    // Fetch all volunteers
+    const volunteers = await VolunteerProfile.find().populate('userId confirmedEvents');
 
+    // Fetch all upcoming events (events with dates in the future)
+    const today = new Date();
+    const upcomingEvents = await Event.find({ date: { $gte: today } });
 
-module.exports = { createEvent, updateEvent, registerVolunteerToEvent, getEvents, getAvailableEvents, 
-                   getScheduledEvents, unregisterVolunteerFromEvent };
+    // Initialize a map to track volunteer counts per event
+    const eventVolunteerCounts = {};
+
+    // Fetch existing registrations
+    upcomingEvents.forEach((event) => {
+      eventVolunteerCounts[event._id.toString()] = event.registeredVolunteers.length || 0;
+    });
+
+    // Urgency mapping
+    const urgencyLevels = { High: 3, Medium: 2, Low: 1 };
+
+    // Perform matching
+    for (const volunteer of volunteers) {
+      const availableEvents = upcomingEvents.filter((event) =>
+        isVolunteerAvailableForEvent(volunteer, event)
+      );
+
+      // Sort available events by urgency and volunteer count
+      availableEvents.sort((a, b) => {
+        const urgencyDifference = urgencyLevels[b.urgency] - urgencyLevels[a.urgency];
+        if (urgencyDifference !== 0) return urgencyDifference;
+
+        // If urgency is the same, assign to event with fewer volunteers
+        const aVolunteerCount = eventVolunteerCounts[a._id.toString()] || 0;
+        const bVolunteerCount = eventVolunteerCounts[b._id.toString()] || 0;
+
+        return aVolunteerCount - bVolunteerCount;
+      });
+
+      for (const event of availableEvents) {
+        const eventIdStr = event._id.toString();
+
+        // Check if the volunteer is already registered for an event that conflicts with this event
+        const hasConflict = volunteer.confirmedEvents.some((registeredEvent) =>
+          hasTimeConflict(event, registeredEvent)
+        );
+
+        if (hasConflict) {
+          continue; // Skip this event due to time conflict
+        }
+
+        // Proceed to register the volunteer
+
+        // Register the volunteer to the event
+        event.registeredVolunteers.push(volunteer._id);
+        await event.save();
+
+        // Update the volunteer's confirmedEvents
+        volunteer.confirmedEvents.push(event._id);
+        await volunteer.save();
+
+        // Update the volunteer count for the event
+        eventVolunteerCounts[eventIdStr] = (eventVolunteerCounts[eventIdStr] || 0) + 1;
+
+        // Break after assigning to one event
+        break;
+      }
+    }
+
+    res.status(200).json({ msg: 'Matching completed successfully!' });
+  } catch (error) {
+    console.error('Error running matches:', error);
+    res.status(500).json({ msg: 'Failed to run matches.' });
+  }
+};
+
+const isVolunteerAvailableForEvent = (volunteer, event) => {
+  const eventDate = new Date(event.date);
+  const dayOfWeek = eventDate.toLocaleDateString('en-US', { weekday: 'long' });
+
+  // Check if event is on a blocked date
+  const isBlocked = volunteer.availability.blocked.some((blockedEntry) => {
+    const blockedDate = new Date(blockedEntry.date);
+    return (
+      blockedDate.toDateString() === eventDate.toDateString() &&
+      (blockedEntry.isAllDay ||
+        (blockedEntry.start && blockedEntry.end && isTimeOverlap(event, blockedEntry)))
+    );
+  });
+
+  if (isBlocked) return false;
+
+  // Check if event is on a specific date
+  const isSpecificDateAvailable = volunteer.availability.specific.some((specificEntry) => {
+    const specificDate = new Date(specificEntry.date);
+    return (
+      specificDate.toDateString() === eventDate.toDateString() &&
+      (specificEntry.isAllDay ||
+        (specificEntry.start && specificEntry.end && isTimeOverlap(event, specificEntry)))
+    );
+  });
+
+  if (isSpecificDateAvailable) return true;
+
+  // Check general availability
+  const generalAvailability = volunteer.availability.general[dayOfWeek];
+  if (generalAvailability && generalAvailability.isAvailable) {
+    if (generalAvailability.isAllDay) {
+      return true;
+    } else if (generalAvailability.start && generalAvailability.end) {
+      return isTimeOverlap(event, generalAvailability);
+    }
+  }
+
+  return false;
+};
+
+const isTimeOverlap = (event, availability) => {
+  const eventStart = new Date(`${event.date.toISOString().split('T')[0]}T${event.timeStart}`);
+  const eventEnd = new Date(`${event.date.toISOString().split('T')[0]}T${event.timeEnd}`);
+
+  const availStart = new Date(
+    `${event.date.toISOString().split('T')[0]}T${availability.start}`
+  );
+  const availEnd = new Date(`${event.date.toISOString().split('T')[0]}T${availability.end}`);
+
+  return eventStart < availEnd && eventEnd > availStart;
+};
+
+module.exports = { createEvent, updateEvent, registerVolunteerToEvent, getEvents, 
+                   getAvailableEvents, getScheduledEvents, unregisterVolunteerFromEvent, 
+                   runMatches, getUpcomingEvents, getPastEvents };
