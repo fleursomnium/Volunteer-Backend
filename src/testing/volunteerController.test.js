@@ -1,124 +1,46 @@
-// const VolunteerProfile = require('../models/volunteerprofileModel');
-
-// // Update volunteer profile
-// const updateVolunteerProfile = async (req, res) => {
-//     const { userId } = req.user;  // Now req.user is populated by the middleware
-//     const { firstName, lastName, preferences, skills, address1, address2, city, state, zipcode, availability } = req.body;
-
-//     try {
-//         const profile = await VolunteerProfile.findOne({ userId });
-
-//         if (!profile) {
-//             return res.status(404).json({ msg: 'Profile not found' });
-//         }
-
-//         // Update profile fields
-//         profile.firstName = firstName || profile.firstName;
-//         profile.lastName = lastName || profile.lastName;
-//         profile.preferences = preferences || profile.preferences;
-//         profile.skills = skills || profile.skills;
-//         profile.address.address1 = address1 || profile.address.address1;
-//         profile.address.address2 = address2 || profile.address.address2;
-//         profile.address.city = city || profile.address.city;
-//         profile.address.state = state || profile.address.state;
-//         profile.address.zipcode = zipcode || profile.address.zipcode;
-//         profile.availability = availability || profile.availability;
-
-//         await profile.save();
-
-//         res.status(200).json({ msg: 'Profile updated successfully', profile });
-//     } catch (error) {
-//         res.status(500).json({ msg: 'Server error' });
-//     }
-// };
 
 
-// module.exports = { updateVolunteerProfile };
-
-//10/31
-// const { updateVolunteerProfile } = require('../controllers/volunteerController');
-// const VolunteerProfile = require('../models/volunteerprofileModel');
-
-// jest.mock('../models/volunteerprofileModel'); // Mock the VolunteerProfile model
-
-// describe('VolunteerController - updateVolunteerProfile', () => {
-//     let req, res;
-
-//     beforeEach(() => {
-//         req = {
-//             user: { userId: 'volunteer123' },
-//             body: {
-//                 firstName: 'Jane',
-//                 lastName: 'Doe',
-//                 skills: ['Teamwork'],
-//                 address1: '123 Main St',
-//                 city: 'Houston',
-//                 state: 'TX',
-//                 zipcode: '77001',
-//                 availability: ['2024-10-01'],
-//             },
-//         };
-
-//         res = {
-//             status: jest.fn().mockReturnThis(),
-//             json: jest.fn(),
-//         };
-
-//         jest.clearAllMocks();
-//     });
-
-//     it('should update volunteer profile successfully', async () => {
-//         // Mocking VolunteerProfile.findOne to return a volunteer profile
-//         VolunteerProfile.findOne.mockResolvedValue({
-//             save: jest.fn(),
-//         });
-
-//         await updateVolunteerProfile(req, res);
-
-//         expect(res.status).toHaveBeenCalledWith(200);
-//         expect(res.json).toHaveBeenCalledWith({
-//             msg: 'Profile updated successfully',
-//             profile: expect.any(Object),
-//         });
-//     });
-
-//     it('should return 404 if profile not found', async () => {
-//         // Mocking VolunteerProfile.findOne to return null
-//         VolunteerProfile.findOne.mockResolvedValue(null);
-
-//         await updateVolunteerProfile(req, res);
-
-//         expect(res.status).toHaveBeenCalledWith(404);
-//         expect(res.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
-//     });
-// });
 
 
-//10//31
-const { updateVolunteerProfile } = require('../controllers/volunteerController');
-const VolunteerProfile = require('../models/volunteerProfileModel'); // Make sure the case matches exactly
 
-jest.mock('../models/volunteerProfileModel'); // Mock the VolunteerProfile model
 
-describe('VolunteerController - updateVolunteerProfile', () => {
-    let req, res;
+
+
+
+
+
+
+const mongoose = require('mongoose');
+const {
+    getVolunteerProfile,
+    updateVolunteerProfile,
+    getVolunteerHistory,
+    updateGeneralAvailability,
+} = require('../controllers/volunteerController');
+const VolunteerProfile = require('../models/volunteerProfileModel');
+
+jest.mock('../models/volunteerProfileModel');
+
+describe('VolunteerController', () => {
+    let mockReq, mockRes;
+
+    beforeAll(() => {
+        jest.mock('mongoose', () => ({
+            ...jest.requireActual('mongoose'),
+            connect: jest.fn(),
+            connection: {
+                close: jest.fn(),
+            },
+        }));
+    });
 
     beforeEach(() => {
-        req = {
-            user: { userId: 'volunteer123' },
-            body: {
-                firstName: 'Jane',
-                lastName: 'Doe',
-                skills: ['Teamwork'],
-                address1: '123 Main St',
-                city: 'Houston',
-                state: 'TX',
-                zipcode: '77001',
-                availability: ['2024-10-01'],
-            },
+        mockReq = {
+            user: { userId: new mongoose.Types.ObjectId() },
+            body: {},
         };
 
-        res = {
+        mockRes = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
         };
@@ -126,39 +48,543 @@ describe('VolunteerController - updateVolunteerProfile', () => {
         jest.clearAllMocks();
     });
 
-    it('should update volunteer profile successfully', async () => {
-        // Mocking VolunteerProfile.findOne to return a volunteer profile
-        VolunteerProfile.findOne.mockResolvedValue({
-            firstName: 'OldFirstName',
-            lastName: 'OldLastName',
-            skills: [],
-            address: {
-                address1: '',
-                address2: '',
-                city: '',
-                state: '',
-                zipcode: '',
-            },
-            availability: [],
-            save: jest.fn(), // Mock the save function on the profile object
+    describe('getVolunteerProfile', () => {
+        it('should return a volunteer profile with the role', async () => {
+            const mockProfile = { name: 'John Doe', role: 'volunteer' };
+            VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+            await getVolunteerProfile(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+            expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
         });
 
-        await updateVolunteerProfile(req, res);
+        it('should return 404 if profile is not found', async () => {
+            VolunteerProfile.findOne.mockResolvedValue(null);
 
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({
-            msg: 'Profile updated successfully',
-            profile: expect.any(Object),
+            await getVolunteerProfile(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockRes.status).toHaveBeenCalledWith(404);
+            expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
         });
     });
 
-    it('should return 404 if profile not found', async () => {
-        // Mocking VolunteerProfile.findOne to return null
-        VolunteerProfile.findOne.mockResolvedValue(null);
+    describe('updateVolunteerProfile', () => {
+        it('should update a volunteer profile', async () => {
+            const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+            VolunteerProfile.findOne.mockResolvedValue(mockProfile);
 
-        await updateVolunteerProfile(req, res);
+            mockReq.body = { name: 'Updated Name' };
 
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+            await updateVolunteerProfile(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockProfile.save).toHaveBeenCalled();
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+            expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+        });
+
+        it('should return 404 if profile is not found', async () => {
+            VolunteerProfile.findOne.mockResolvedValue(null);
+
+            await updateVolunteerProfile(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockRes.status).toHaveBeenCalledWith(404);
+            expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+        });
+    });
+
+    describe('getVolunteerHistory', () => {
+        it('should return the volunteer history', async () => {
+            VolunteerProfile.findOne.mockImplementation(() => ({
+                populate: jest.fn().mockResolvedValue({ history: [{ event: 'Event A' }] }),
+            }));
+
+            await getVolunteerHistory(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+            expect(mockRes.json).toHaveBeenCalledWith([{ event: 'Event A' }]);
+        });
+
+        it('should return 404 if profile is not found', async () => {
+            VolunteerProfile.findOne.mockResolvedValue(null);
+
+            await getVolunteerHistory(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockRes.status).toHaveBeenCalledWith(404);
+            expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+        });
+    });
+
+    describe('updateGeneralAvailability', () => {
+        it('should update general availability', async () => {
+            const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+            VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+            mockReq.body = { availability: ['Monday'] };
+
+            await updateGeneralAvailability(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockProfile.save).toHaveBeenCalled();
+            expect(mockRes.status).toHaveBeenCalledWith(200);
+            expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+        });
+
+        it('should return 404 if profile is not found', async () => {
+            VolunteerProfile.findOne.mockResolvedValue(null);
+
+            await updateGeneralAvailability(mockReq, mockRes);
+
+            expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+            expect(mockRes.status).toHaveBeenCalledWith(404);
+            expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+        });
     });
 });
+
+
+
+
+
+
+// const mongoose = require('mongoose');
+// const {
+//     getVolunteerProfile,
+//     updateVolunteerProfile,
+//     getVolunteerHistory,
+//     updateGeneralAvailability,
+// } = require('../controllers/volunteerController');
+// const VolunteerProfile = require('../models/volunteerProfileModel');
+
+// // Mock the model
+// jest.mock('../models/volunteerProfileModel');
+
+// describe('VolunteerController', () => {
+//     let mockReq, mockRes;
+
+//     beforeEach(() => {
+//         // Mock request and response objects
+//         mockReq = {
+//             user: { userId: new mongoose.Types.ObjectId() },
+//             body: {},
+//         };
+
+//         mockRes = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks(); // Reset mocks before each test
+//     });
+
+//     describe('getVolunteerProfile', () => {
+//         it('should return a volunteer profile with the role', async () => {
+//             const mockProfile = { name: 'John Doe', role: 'volunteer' };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             await getVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await getVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+//         });
+//     });
+
+//     describe('updateVolunteerProfile', () => {
+//         it('should update a volunteer profile', async () => {
+//             const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             mockReq.body = { name: 'Updated Name' };
+
+//             await updateVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockProfile.save).toHaveBeenCalled();
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await updateVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+//         });
+//     });
+
+//     describe('getVolunteerHistory', () => {
+//         it('should return the volunteer history', async () => {
+//             const mockHistory = { history: [{ event: 'Event A' }] };
+//             VolunteerProfile.findOne.mockReturnValue({
+//                 populate: jest.fn().mockResolvedValue(mockHistory),
+//             });
+
+//             await getVolunteerHistory(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockHistory.history);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await getVolunteerHistory(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+//         });
+//     });
+
+//     describe('updateGeneralAvailability', () => {
+//         it('should update general availability', async () => {
+//             const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             mockReq.body = { availability: ['Monday'] };
+
+//             await updateGeneralAvailability(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockProfile.save).toHaveBeenCalled();
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await updateGeneralAvailability(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Profile not found' });
+//         });
+//     });
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+// keep it//
+//const mongoose = require('mongoose');
+// const {
+//     getVolunteerProfile,
+//     updateVolunteerProfile,
+//     getVolunteerHistory,
+//     updateGeneralAvailability,
+// } = require('../controllers/volunteerController');
+// const VolunteerProfile = require('../models/volunteerProfileModel');
+
+// jest.mock('../models/volunteerProfileModel');
+
+// describe('VolunteerController', () => {
+//     let mockReq, mockRes;
+
+//     beforeAll(() => {
+//         jest.mock('mongoose', () => ({
+//             ...jest.requireActual('mongoose'),
+//             connect: jest.fn(),
+//             connection: {
+//                 close: jest.fn(),
+//             },
+//         }));
+//     });
+
+//     beforeEach(() => {
+//         mockReq = {
+//             user: { userId: new mongoose.Types.ObjectId() },
+//             body: {},
+//         };
+
+//         mockRes = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     describe('getVolunteerProfile', () => {
+//         it('should return a volunteer profile with the role', async () => {
+//             const mockProfile = { name: 'John Doe', role: 'volunteer' };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             await getVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await getVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+
+//     describe('updateVolunteerProfile', () => {
+//         it('should update a volunteer profile', async () => {
+//             const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             mockReq.body = { name: 'Updated Name' };
+
+//             await updateVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockProfile.save).toHaveBeenCalled();
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await updateVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+
+//     describe('getVolunteerHistory', () => {
+//         it('should return the volunteer history', async () => {
+//             VolunteerProfile.findOne.mockImplementation(() => ({
+//                 populate: jest.fn().mockResolvedValue({ history: [{ event: 'Event A' }] }),
+//             }));
+
+//             await getVolunteerHistory(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith([{ event: 'Event A' }]);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await getVolunteerHistory(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+
+//     describe('updateGeneralAvailability', () => {
+//         it('should update general availability', async () => {
+//             const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             mockReq.body = { availability: ['Monday'] };
+
+//             await updateGeneralAvailability(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockProfile.save).toHaveBeenCalled();
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await updateGeneralAvailability(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+// });
+
+
+
+
+
+
+
+// const mongoose = require('mongoose');
+// const {
+//     getVolunteerProfile,
+//     updateVolunteerProfile,
+//     getVolunteerHistory,
+//     updateGeneralAvailability,
+// } = require('../controllers/volunteerController');
+// const VolunteerProfile = require('../models/volunteerProfileModel');
+
+// jest.mock('../models/volunteerProfileModel');
+
+// describe('VolunteerController', () => {
+//     let mockReq, mockRes;
+
+//     beforeAll(() => {
+//         jest.mock('mongoose', () => ({
+//             ...jest.requireActual('mongoose'),
+//             connect: jest.fn(),
+//             connection: {
+//                 close: jest.fn(),
+//             },
+//         }));
+//     });
+
+//     beforeEach(() => {
+//         mockReq = {
+//             user: { userId: new mongoose.Types.ObjectId() },
+//             body: {},
+//         };
+
+//         mockRes = {
+//             status: jest.fn().mockReturnThis(),
+//             json: jest.fn(),
+//         };
+
+//         jest.clearAllMocks();
+//     });
+
+//     describe('getVolunteerProfile', () => {
+//         it('should return a volunteer profile with the role', async () => {
+//             const mockProfile = { name: 'John Doe', role: 'volunteer' };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             await getVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await getVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+
+//     describe('updateVolunteerProfile', () => {
+//         it('should update a volunteer profile', async () => {
+//             const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             mockReq.body = { name: 'Updated Name' };
+
+//             await updateVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockProfile.save).toHaveBeenCalled();
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await updateVolunteerProfile(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+
+//     describe('getVolunteerHistory', () => {
+//         it('should return the volunteer history', async () => {
+//             VolunteerProfile.findOne.mockImplementation(() => ({
+//                 populate: jest.fn().mockResolvedValue({ history: [{ event: 'Event A' }] }),
+//             }));
+
+//             await getVolunteerHistory(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith([{ event: 'Event A' }]);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await getVolunteerHistory(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+
+//     describe('updateGeneralAvailability', () => {
+//         it('should update general availability', async () => {
+//             const mockProfile = { save: jest.fn().mockResolvedValue(true) };
+//             VolunteerProfile.findOne.mockResolvedValue(mockProfile);
+
+//             mockReq.body = { availability: ['Monday'] };
+
+//             await updateGeneralAvailability(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockProfile.save).toHaveBeenCalled();
+//             expect(mockRes.status).toHaveBeenCalledWith(200);
+//             expect(mockRes.json).toHaveBeenCalledWith(mockProfile);
+//         });
+
+//         it('should return 404 if profile is not found', async () => {
+//             VolunteerProfile.findOne.mockResolvedValue(null);
+
+//             await updateGeneralAvailability(mockReq, mockRes);
+
+//             expect(VolunteerProfile.findOne).toHaveBeenCalledWith({ userId: mockReq.user.userId });
+//             expect(mockRes.status).toHaveBeenCalledWith(404);
+//             expect(mockRes.json).toHaveBeenCalledWith({ msg: 'Volunteer profile not found' });
+//         });
+//     });
+// });
+
+
+
+
+
+
+
+
+
+

@@ -64,12 +64,10 @@ cron.schedule('0 0 * * *', async () => {
 
 // Start Server
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//console.log(`Server running on port ${PORT}`);
+// });
 module.exports = app;
-
-// //10//31 //server.js
 
 
 //11/1

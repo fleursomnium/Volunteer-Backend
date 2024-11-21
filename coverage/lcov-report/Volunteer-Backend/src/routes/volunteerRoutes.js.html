@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -97,88 +97,82 @@
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a>
-<a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">//src\routes\voluneerRoutes.js
+<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">//src\routes\voluneerRoutes.js
 const express = require('express');
-const { updateVolunteerProfile } = require('../controllers/volunteerController');
+const { updateVolunteerProfile, getVolunteerProfile, getVolunteerHistory, 
+    updateGeneralAvailability, updateBlockedDates, updateSpecificAvailability, 
+    updateAvailability, getAvailability } = require('../controllers/volunteerController');
 const verifyToken = require('../middleware/authMiddleware'); // Import the middleware
 &nbsp;
 const router = express.Router();
 &nbsp;
-// Apply the middleware to protect the route
+// Route to get the volunteer profile
+router.get('/profile', verifyToken, getVolunteerProfile);
+&nbsp;
+// Route to update the volunteer profile
 router.put('/profile', verifyToken, updateVolunteerProfile);
 &nbsp;
-module.exports = router;
-// 10/29/2024
-//const express = require('express');
-// const { updateVolunteerProfile } = require('../controllers/volunteerController');
-// const verifyToken = require('../middleware/authMiddleware'); // Import the middleware
+// Route to get the volunteer's history
+router.get('/history', verifyToken, getVolunteerHistory);
 &nbsp;
-// const router = express.Router();
+// Route to update general availability
+router.post('/availability/general', verifyToken, updateGeneralAvailability);
 &nbsp;
-// // Apply the middleware to protect the route
-// router.put('/profile', verifyToken, updateVolunteerProfile);
+// Route to update blocked dates
+router.post('/availability/blocked', verifyToken, updateBlockedDates);
 &nbsp;
-// module.exports = router;
+// Route to update specific dates
+router.post('/availability/specific', verifyToken, updateSpecificAvailability);
 &nbsp;
-// //src\routes\voluneerRoutes.js
-// const express = require('express');
-// const { updateVolunteerProfile } = require('../controllers/volunteerController');
-// const verifyToken = require('../middleware/authMiddleware'); // Import the middleware
+//combined updates
+router.patch('/availability', verifyToken, updateAvailability); // Changed from post to patch
 &nbsp;
-// const router = express.Router();
-&nbsp;
-// // Apply the middleware to protect the route
-// router.put('/profile', verifyToken, updateVolunteerProfile);
-&nbsp;
-// module.exports = router;
+//Route to fetch current availability
+router.get('/availability', verifyToken, getAvailability);
 &nbsp;
 &nbsp;
-&nbsp;</pre></td></tr></table></pre>
+module.exports = router;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-11-01T10:52:02.305Z
+                at 2024-11-21T02:08:42.659Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

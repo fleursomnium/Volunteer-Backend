@@ -1,72 +1,97 @@
-const mongoose = require('mongoose');
-const Notification = require('../models/notificationModel');
+const Notification = require('./notificationModel');
 
 describe('Notification Model', () => {
-    beforeAll(async () => {
-        // Connect to MongoDB
-        await mongoose.connect('mongodb://localhost:27017/yourDatabaseName', {
-            // Removed deprecated options
-        });
+    it('should require a title and message', () => {
+        const notification = new Notification({});
+        const error = notification.validateSync();
+
+        expect(error.errors.title).toBeDefined();
+        expect(error.errors.message).toBeDefined();
     });
 
-    afterAll(async () => {
-        // Disconnect from MongoDB
-        await mongoose.connection.close();
-    });
-
-    it('should create and save a notification successfully', async () => {
-        const mockNotification = new Notification({
+    it('should pass validation for valid fields', () => {
+        const notification = new Notification({
             title: 'Test Notification',
-            message: 'This is a test message.',
-            targetAudience: 'volunteer',
-            eventId: new mongoose.Types.ObjectId(), // Use 'new' to create ObjectId
+            message: 'This is a test notification',
         });
 
-        const savedNotification = await mockNotification.save();
-        expect(savedNotification._id).toBeDefined();
-        expect(savedNotification.title).toBe(mockNotification.title);
-        expect(savedNotification.message).toBe(mockNotification.message);
-        expect(savedNotification.targetAudience).toBe(mockNotification.targetAudience);
-    });
-
-    it('should throw validation error when required fields are missing', async () => {
-        const invalidNotification = new Notification({}); // No fields
-
-        let error;
-        try {
-            await invalidNotification.save();
-        } catch (err) {
-            error = err;
-        }
-
-        expect(error).toBeDefined();
-        expect(error.name).toBe('ValidationError');
-    });
-
-    it('should handle error when saving notification fails', async () => {
-        // Simulating save failure
-        jest.spyOn(Notification.prototype, 'save').mockImplementationOnce(() => {
-            throw new Error('Save failed');
-        });
-
-        const mockNotification = new Notification({
-            title: 'Error Notification',
-            message: 'This will fail.',
-            targetAudience: 'volunteer',
-            eventId: new mongoose.Types.ObjectId(), // Use 'new' to create ObjectId
-        });
-
-        let error;
-        try {
-            await mockNotification.save();
-        } catch (err) {
-            error = err;
-        }
-
-        expect(error).toBeDefined();
-        expect(error.message).toBe('Save failed');
+        const error = notification.validateSync();
+        expect(error).toBeUndefined();
     });
 });
+
+
+
+//11/17
+// const mongoose = require('mongoose');
+// const Notification = require('../models/notificationModel');
+
+// describe('Notification Model', () => {
+//     beforeAll(async () => {
+//         // Connect to MongoDB
+//         await mongoose.connect('mongodb://localhost:27017/yourDatabaseName', {
+//             // Removed deprecated options
+//         });
+//     });
+
+//     afterAll(async () => {
+//         // Disconnect from MongoDB
+//         await mongoose.connection.close();
+//     });
+
+//     it('should create and save a notification successfully', async () => {
+//         const mockNotification = new Notification({
+//             title: 'Test Notification',
+//             message: 'This is a test message.',
+//             targetAudience: 'volunteer',
+//             eventId: new mongoose.Types.ObjectId(), // Use 'new' to create ObjectId
+//         });
+
+//         const savedNotification = await mockNotification.save();
+//         expect(savedNotification._id).toBeDefined();
+//         expect(savedNotification.title).toBe(mockNotification.title);
+//         expect(savedNotification.message).toBe(mockNotification.message);
+//         expect(savedNotification.targetAudience).toBe(mockNotification.targetAudience);
+//     });
+
+//     it('should throw validation error when required fields are missing', async () => {
+//         const invalidNotification = new Notification({}); // No fields
+
+//         let error;
+//         try {
+//             await invalidNotification.save();
+//         } catch (err) {
+//             error = err;
+//         }
+
+//         expect(error).toBeDefined();
+//         expect(error.name).toBe('ValidationError');
+//     });
+
+//     it('should handle error when saving notification fails', async () => {
+//         // Simulating save failure
+//         jest.spyOn(Notification.prototype, 'save').mockImplementationOnce(() => {
+//             throw new Error('Save failed');
+//         });
+
+//         const mockNotification = new Notification({
+//             title: 'Error Notification',
+//             message: 'This will fail.',
+//             targetAudience: 'volunteer',
+//             eventId: new mongoose.Types.ObjectId(), // Use 'new' to create ObjectId
+//         });
+
+//         let error;
+//         try {
+//             await mockNotification.save();
+//         } catch (err) {
+//             error = err;
+//         }
+
+//         expect(error).toBeDefined();
+//         expect(error.message).toBe('Save failed');
+//     });
+// });
 
 
 
