@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -20,15 +21,18 @@ const authRoutes = require('./src/routes/authRoutes');
 const eventRoutes = require('./src/routes/eventRoutes');
 const volunteerRoutes = require('./src/routes/volunteerRoutes');
 const statesRoutes = require('./src/routes/statesRoutes');
+const skillsRoutes = require('./src/routes/skillRoutes');
+const volcardsRoutes = require('./src/routes/volcardsRoutes');
 const notificationRoutes = require('./src/routes/notificationRoutes');
 const reportRoutes = require('./src/routes/reportRoutes'); 
-
 
 // Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/volunteers', volunteerRoutes);
 app.use('/api/states', statesRoutes);
+app.use('/api/skills', skillsRoutes);
+app.use('/api/volcards', volcardsRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);
 
@@ -42,24 +46,27 @@ mongoose.connect(process.env.MONGO_URI)
 // Schedule a cron job to run every day at midnight to update volunteer histories
 cron.schedule('0 0 * * *', async () => {
   try {
-    const now = new Date();
-    const pastEvents = await Event.find({ date: { $lt: now } }); // Find events with a past date
+    const today = new Date();
+
+    // Find all past events
+    const pastEvents = await Event.find({ date: { $lt: today } });
 
     for (const event of pastEvents) {
-      // For each past event, update all registered volunteers' histories
+      // Update volunteer histories for the past event
       await VolunteerProfile.updateMany(
         { confirmedEvents: event._id },
         {
-          //$pull: { confirmedEvents: event._id }, // Remove from confirmed events
+          $pull: { confirmedEvents: event._id }, // Remove from confirmed events
           $addToSet: { history: event._id } // Add to history without duplicating
         }
       );
     }
-    //console.log('Volunteer histories updated');
+    console.log('Volunteer histories updated with past events');
   } catch (error) {
     console.error('Error updating volunteer histories:', error);
   }
 });
+
 
 
 // Start Server

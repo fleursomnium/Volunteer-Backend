@@ -26,8 +26,7 @@ const volunteerProfileSchema = new mongoose.Schema({
     state: { type: String, default: '' },
     zipcode: { type: String, default: '' }
   },
-
-  // New Availability Structure
+  addressMode: { type: String, enum: ['manual', 'autocomplete'], default: 'autocomplete' },
   availability: {
     general: {
       type: availabilityGeneralSchema,
@@ -35,10 +34,10 @@ const volunteerProfileSchema = new mongoose.Schema({
     },
     specific: [
       {
-        date: Date,
-        start: String,
-        end: String,
-        isAllDay: Boolean,
+        date: { type: Date, required: true },
+        start: { type: String, default: '' },
+        end: { type: String, default: '' },
+        isAllDay: { type: Boolean, default: false },
       },
     ],
     blocked: [
@@ -49,12 +48,12 @@ const volunteerProfileSchema = new mongoose.Schema({
         isAllDay: Boolean,
       },
     ],
-  }, 
-
+  },
   confirmedEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
-  history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }], // Ensure this line correctly references the Event model
+  history: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
   volunteerFormCompleted: { type: String, enum: ['not completed', 'completed'], default: 'not completed' }
 });
+
 
 // Check if the model has already been compiled, if so, use it; otherwise, compile it.
 module.exports = mongoose.models.VolunteerProfile || mongoose.model('VolunteerProfile', volunteerProfileSchema);
