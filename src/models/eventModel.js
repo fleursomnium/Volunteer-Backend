@@ -17,12 +17,14 @@ const eventSchema = new mongoose.Schema({
   skillsRequired: { type: [String], required: true },
   urgency: { type: String, required: true, enum: ['Low', 'Medium', 'High'] },
   addressMode: { type: String, enum: ['manual', 'autocomplete'], default: 'autocomplete' }, // New Field
-  registeredVolunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VolunteerProfile', default: [] }]
+  registeredVolunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VolunteerProfile', default: [] }],
+  matchedVolunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VolunteerProfile', default: [] }]
 });
 
 const Event = mongoose.model('Event', eventSchema);
 
 module.exports = Event;
+
 //10/29/2024
 // const mongoose = require('mongoose');
 

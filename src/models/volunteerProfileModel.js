@@ -34,10 +34,10 @@ const volunteerProfileSchema = new mongoose.Schema({
     },
     specific: [
       {
-        date: Date,
-        start: String,
-        end: String,
-        isAllDay: Boolean,
+        date: { type: Date, required: true },
+        start: { type: String, default: '' },
+        end: { type: String, default: '' },
+        isAllDay: { type: Boolean, default: false },
       },
     ],
     blocked: [
