@@ -1,4 +1,10 @@
-//src\controllers\eventController.js
+
+
+
+
+
+
+
 const Event = require('../models/eventModel');
 const VolunteerProfile = require('../models/volunteerProfileModel');
 const Notification = require('../models/notificationModel');
@@ -477,6 +483,16 @@ const getScheduledEvents = async (req, res) => {
 
 module.exports = { createEvent, updateEvent, getEvent, matchVolunteersToEvent, acceptMatchedEvent, registerFromMatch, unregisterVolunteer, 
   getEvents, getUpcomingEvents, getPastEvents, getAvailableEvents, getScheduledEvents, rejectMatchedEvent };
+
+
+
+
+
+
+
+
+
+
 
 // const hasTimeConflict = (event1, event2) => {
 //   // Check if the events are on the same date
